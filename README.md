@@ -15,7 +15,7 @@ stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 
 ## Multiagents diagram
 
-[Watch Multiagents in action](images/agenticworkflow.mov)
+[Watch Multiagents in action](images/agenticworkflow.gif)
 
 ---
 
