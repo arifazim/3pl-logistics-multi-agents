@@ -13,78 +13,9 @@ stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 
 ---
 
-## Architecture diagram
+## Multiagents diagram
 
-> Renders on GitHub. Paste the block below into <https://mermaid.live> to export an image.
-
-```mermaid
-flowchart TB
-    U(["Shipper / Dispatcher"])
-    UI["FastAPI Dashboard + A2UI"]
-    ORC["OrchestratorAgent — NL routing"]
-    VEND(["Vendor receives payment"])
-
-    subgraph FLEET["Agent Fleet · Google ADK + Vertex AI (Gemini 2.0 Flash)"]
-        direction TB
-        QDA["QuotationDecisionAgent<br/>rank · quote · comply"]
-        COM["CommerceAgent<br/>AP2 mandates + payment"]
-        SUP["HumanSupervisorAgent<br/>HITL structured summary"]
-        A2UI["A2UIConciergeAgent<br/>dashboard + narrative"]
-        OPS["OperationsInsightAgent"]
-        LP["LoadPlanningAgent<br/>OR-Tools CVRPTW"]
-        SEC["SecuritySentinelAgent<br/>red · blue · green"]
-    end
-
-    subgraph A2A["A2A · Carrier Agents"]
-        direction LR
-        V1["SwiftTransport"]
-        V2["FalconFreight"]
-        V3["EcoHaul"]
-    end
-
-    subgraph PAY["AP2 Payment Rails · sandbox only"]
-        direction LR
-        PLD["Plaid sandbox<br/>bank funding token"]
-        STR["Stripe test-mode<br/>card / ACH"]
-        PLD -->|funding| STR
-    end
-
-    subgraph TOOLS["Deterministic Tools"]
-        direction LR
-        QE["QuotationEngine"]
-        VSC["VendorScorer"]
-        ORT["OR-Tools CVRPTW"]
-    end
-
-    subgraph MCP["MCP Server · stdio JSON-RPC"]
-        direction LR
-        RC["rate_card"]
-        VD["vendor"]
-        PT["policy"]
-        TM["telemetry"]
-        TS["tms"]
-    end
-
-    U --> UI --> ORC --> QDA
-    QDA -->|"1 · selected vendor + 12% margin"| COM
-    COM <-->|"2 · quote_request / counter_offer"| A2A
-    COM -->|"3 · Cart Mandate ≤ Intent cap"| SUP
-    SUP -->|"4 · approved"| STR
-    STR -->|"5 · payment receipt"| VEND
-    COM -->|"6 · settlement"| A2UI --> UI
-    QDA --> QE
-    QDA --> VSC
-    LP --> ORT
-    QE --> RC
-    VSC --> VD
-    OPS --> TM
-
-    style FLEET fill:#eef3ff,stroke:#4285F4,stroke-width:2px
-    style A2A fill:#f3e8fd,stroke:#9b72cb,stroke-width:2px
-    style PAY fill:#fdecea,stroke:#EA4335,stroke-width:2px
-    style TOOLS fill:#e7f5ec,stroke:#34A853,stroke-width:2px
-    style MCP fill:#fef7e0,stroke:#F9A825,stroke-width:2px
-```
+[Watch Multiagents in action](images/agenticworkflow.mov)
 
 ---
 
@@ -210,10 +141,9 @@ This project was built using **OpenCode** (antigravity IDE) with **antigravity m
 ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — full system design, agents, harness, workflows, stack.
-- [KAGGLE.md](KAGGLE.md) — Kaggle submission package (writeup, notebook, input, output, logs).
 - [BUILD.md](BUILD.md) — Cloud Run build + deploy notes.
-- [AGENTS.md](AGENTS.md) — developer reference for OpenCode / agentic IDE sessions.
-- [REVIEW.md](REVIEW.md) — capability-by-capability review against the capstone spec.
+- [AGENTS.md](AGENTS.md) — developer reference for Antigravity IDE sessions.
+- [COURSE-REVIEW.md](COURSE-REVIEW.md) — capability-by-capability review against the capstone spec.
 
 ---
 
