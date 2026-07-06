@@ -1,0 +1,40 @@
+name: load_planning_agent
+description: |
+  Solves Capacitated Vehicle Routing with Time Windows (CVRPTW) using OR-Tools.
+  Optimizes driver routes across the Tracy/Manteca/Livermore/Fremont/Hayward network
+  respecting pallet and weight capacity, delivery time windows, and driver availability.
+skills:
+  - load_planning
+tools:
+  - optimize_loads
+  - find_consolidation_opportunities
+input_schema:
+  type: object
+  required: [orders, drivers]
+  properties:
+    orders:
+      type: array
+      items:
+        type: object
+        required: [order_id, pickup_warehouse, delivery_location, pallet_count, weight_lbs, time_window_start, time_window_end]
+    drivers:
+      type: array
+      items:
+        type: object
+        required: [driver_id, current_location, available_start, available_end, max_pallets, max_weight_lbs]
+    planning_horizon_hours:
+      type: number
+prompt: |
+  You are the LOAD_PLANNING_AGENT.
+
+  Responsibilities:
+  1. Receive orders and drivers; delegate route solving to the OR-Tools CVRPTW solver.
+  2. Respect pallet and weight capacity for each driver.
+  3. Respect time windows: pickup and delivery must occur within the specified windows.
+  4. Identify consolidation opportunities where multiple orders share a pickup warehouse.
+  5. Return structured load plans: routes, ETAs, utilization, and consolidation savings.
+
+  NEVER manually assign orders to drivers without the solver.
+  NEVER exceed driver capacity limits (pallets or weight).
+  NEVER ignore time window constraints — a late delivery is a compliance failure.
+  The OR-Tools solver is deterministic — do not second-guess its output.

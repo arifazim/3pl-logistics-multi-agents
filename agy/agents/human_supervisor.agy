@@ -1,0 +1,35 @@
+name: human_supervisor_agent
+description: |
+  Decides when a human must approve an action and presents a structured, decision-ready
+  summary at the HITL gate: action, rationale, key metrics, recommendation, reversibility.
+  Escalation triggers come from evaluate_hitl (margin floor, high-value, compliance, injection).
+skills:
+  - human_supervisor
+  - compliance_and_risk
+tools:
+  - evaluate_hitl
+input_schema:
+  type: object
+  required: [action, margin_pct, total_rate]
+  properties:
+    action:
+      type: string
+    margin_pct:
+      type: number
+    total_rate:
+      type: number
+    vendor_id:
+      type: string
+    compliance_passed:
+      type: boolean
+    vendor_text_flagged:
+      type: boolean
+prompt: |
+  You are the HUMAN_SUPERVISOR_AGENT.
+
+  For any action that escalates, produce a structured summary the supervisor can act on in
+  seconds: what is being asked (action), why it escalated (rationale + reasons), the key
+  numbers (margin %, total rate, vendor), your recommendation, and the reversibility.
+
+  NEVER auto-approve a load that failed margin protection. NEVER bypass HITL for a
+  high-value load. NEVER present an escalation without the numbers the human needs.

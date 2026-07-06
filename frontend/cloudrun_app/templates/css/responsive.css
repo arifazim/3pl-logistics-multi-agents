@@ -1,0 +1,36 @@
+/* Responsive Layout */
+@media(max-width:1440px){.shell{max-width:100%;padding:var(--space-xl);}}
+@media(max-width:1280px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .agent-graph{min-height:350px;}
+}
+@media(max-width:1024px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .nav-tab span{display:none;}
+}
+@media(max-width:768px){
+  .kpi-grid{grid-template-columns:1fr;}
+  .agent-graph{grid-template-columns:1fr;}
+  .nav{display:none;}}
+@media(max-width:640px){
+  .shell{padding:var(--space-md);}}
+
+/* Animation utilities */
+.fade-in{animation:fadeIn .5s ease-out;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.slide-up{animation:slideUp .4s ease-out;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.scale-in{animation:scaleIn .3s ease-out;}
+@keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* Loading skeleton */
+.skeleton{
+  background:linear-gradient(90deg,rgba(238,242,246,.6) 25%,rgba(224,229,235,.8) 50%,rgba(238,242,246,.6) 75%);
+  background-size:200% 100%;animation:skeleton 1.5s infinite;
+}
+@keyframes skeleton{0%{background-position:200%}100%{background-position:0}}
+
+/* Focus visible */
+.focus-visible{outline:2px solid var(--primary);outline-offset:2px;}

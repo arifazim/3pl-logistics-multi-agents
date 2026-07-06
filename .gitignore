@@ -1,0 +1,25 @@
+# Secrets — NEVER commit payment/API credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+Claude.md
+Kaggle.md
+Video.md
+.aider.*
+.windsurf
+.vscode
+.venv
+.Claude
+.github
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# OS
+.DS_Store
+.aider*

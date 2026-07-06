@@ -1,0 +1,17 @@
+system:
+  environment: local
+  min_margin_percentage: 12.0
+  version: "1.0.0"
+
+models:
+  default_model: gemini-1.5-flash
+  alternative_model: gemini-1.5-pro
+  temperature: 0.1
+
+rules:
+  sla_express_hours: 36
+  sla_standard_hours: 72
+  sla_saver_hours: 120
+  fuel_surcharge_per_mile: 0.45
+  max_weight_lbs: 45000.0
+  max_volume_cbft: 1000.0

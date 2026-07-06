@@ -1,0 +1,19 @@
+{
+  "name": "3pl-orchestrator",
+  "version": "1.0.0",
+  "description": "Consolidated MCP server for 3PL vertical slice",
+  "transport": "stdio",
+  "tool_namespaces": ["rate_card", "vendor", "policy", "telemetry", "tms"],
+  "tools": [
+    "rate_card.get_customer_lane",
+    "rate_card.get_vendor_rates",
+    "vendor.list",
+    "vendor.get",
+    "vendor.rank_for_lane",
+    "policy.list",
+    "policy.check_compliance",
+    "telemetry.get_snapshot",
+    "telemetry.log_event",
+    "tms.list_shipments"
+  ]
+}

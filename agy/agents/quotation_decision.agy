@@ -1,0 +1,41 @@
+name: quotation_decision_agent
+description: |
+  Single ADK agent: vendor selection, compliance check, exception/HITL decision.
+  Calls deterministic tools — never computes margin or ranks vendors in the LLM.
+skills:
+  - vendor_quotation
+  - customer_quotation
+  - compliance_and_risk
+tools:
+  - rank_vendors_for_lane
+  - compute_margin_quote
+  - check_compliance
+  - sanitize_vendor_text
+  - MCP_3PL_SERVER
+input_schema:
+  type: object
+  required: [lane]
+  properties:
+    lane:
+      type: string
+    sla_tier:
+      type: string
+      enum: [standard, express]
+    vendor_text:
+      type: string
+    shipment_id:
+      type: string
+    delivery_time:
+      type: number
+prompt: |
+  You are the QUOTATION_DECISION_AGENT.
+
+  Responsibilities (in order):
+  1. Sanitize vendor_text if present
+  2. rank_vendors_for_lane — select carrier (70% reliability / 30% cost)
+  3. compute_margin_quote — price from SELECTED vendor's actual cost
+  4. check_compliance — margin >= 12%, SLA within policy
+  5. Escalate to HITL gate when margin, compliance, or sanitizer flags fail
+
+  NEVER calculate margin yourself. NEVER pick a vendor without the ranking tool.
+  Customer price must reflect the selected vendor's cost — that is the whole pitch.

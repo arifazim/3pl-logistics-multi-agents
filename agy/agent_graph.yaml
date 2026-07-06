@@ -1,0 +1,163 @@
+graph:
+  name: "3PL Multi-Agent Optimization System"
+  version: "4.0.0"
+
+  # Multi-agent fleet + deterministic tools + consolidated MCP server
+  nodes:
+    - name: quotation_decision
+      type: LlmAgent
+      role: QuotationDecision
+      file: agy/agents/quotation_decision.agy
+      module: runtime.agents.quotation_decision_agent
+      skills: [vendor_quotation, customer_quotation, compliance_and_risk]
+      harness: "load_agy + load_agent_skills + AdkAgent + InMemoryRunner"
+      notes: "Vendor selection, compliance, exception/HITL — calls tools only"
+    - name: orchestrator
+      type: LlmAgent
+      role: Orchestrator
+      file: agy/agents/orchestrator.agy
+      module: runtime.agents.orchestrator_agent
+      skills: [operations_insight]
+      harness: "load_agy + load_agent_skills + AdkAgent + InMemoryRunner"
+      notes: "Routes natural-language requests to the correct workflow (Vibe)"
+    - name: commerce
+      type: DeterministicAgent
+      role: Commerce
+      file: agy/agents/commerce.agy
+      module: runtime.agents.commerce_agent
+      skills: [commerce, vendor_quotation]
+      harness: "load_agy + load_agent_skills (skill context loaded; no LLM — deterministic AP2)"
+      notes: "AP2 buyer/broker — Intent/Cart mandates, A2A negotiation, sandbox payment"
+    - name: human_supervisor
+      type: GateAgent
+      role: HumanSupervisor
+      file: agy/agents/human_supervisor.agy
+      module: runtime.agents.human_supervisor_agent
+      skills: [human_supervisor, compliance_and_risk]
+      harness: "load_agy + load_agent_skills (skill context loaded; gate logic is deterministic)"
+      notes: "Structured HITL summaries — action, rationale, metrics, recommendation, reversibility"
+    - name: operations_insight
+      type: DeterministicAgent
+      role: OperationsInsight
+      file: agy/agents/operations_insight.agy
+      module: runtime.agents.operations_insight_agent
+      skills: [operations_insight]
+      harness: "load_agy + load_agent_skills (skill context loaded; heuristic + MCP data)"
+      notes: "Warehouse-flow bottlenecks, dwell prediction, vendor reliability, pallet readiness"
+    - name: load_planning
+      type: OptimizationAgent
+      role: LoadPlanning
+      file: agy/agents/load_planning.agy
+      module: runtime.agents.load_planning_agent
+      skills: [load_planning]
+      harness: "load_agy + load_agent_skills (skill context loaded; OR-Tools CVRPTW solver)"
+      notes: "OR-Tools CVRPTW — capacity + time-window constrained routing"
+    - name: a2ui_concierge
+      type: PresentationAgent
+      role: A2UIConcierge
+      file: agy/agents/a2ui_concierge.agy
+      module: runtime.agents.a2ui_concierge_agent
+      skills: [a2ui_concierge]
+      harness: "load_agy + load_agent_skills (skill context loaded; template-driven presentation)"
+      notes: "Audience-specific dashboards + narrative summaries (Agent-to-UI)"
+    - name: security_sentinel
+      type: SecurityAgent
+      role: SecuritySentinel
+      file: agy/agents/security_sentinel.agy
+      module: runtime.agents.security_sentinel_agent
+      skills: [security_sentinel]
+      harness: "load_agy + load_agent_skills (skill context loaded; red/blue/green simulation)"
+      notes: "Red/blue/green team testing, hardening, continuous validation"
+
+  tools:
+    - name: quotation_engine
+      type: DeterministicTool
+      module: runtime.tools.quotation_engine
+    - name: vendor_scorer
+      type: DeterministicTool
+      module: runtime.tools.vendor_scorer
+    - name: vendor_text_sanitizer
+      type: SecurityTool
+      module: runtime.security.vendor_text_sanitizer
+    - name: trajectory_evaluator
+      type: EvalTool
+      module: runtime.evaluation.trajectory_evaluator
+
+  gates:
+    - name: hitl_gate
+      type: HumanInTheLoop
+      module: runtime.hitl.gate
+
+  workflows:
+    dual_quotation:
+      type: Workflow
+      agent: quotation_decision
+      steps: [vendor_rank, margin_quote, compliance, hitl, trajectory_eval]
+    customer_quotation: { agent: quotation_decision }
+    vendor_quotation: { agent: quotation_decision }
+    compliance_check: { agent: quotation_decision }
+    operations_insight: { agent: operations_insight }
+    vendor_reliability: { agent: operations_insight }
+    pallet_readiness: { agent: operations_insight }
+    load_planning: { agent: load_planning }
+    generate_dashboard: { agent: a2ui_concierge }
+    generate_narrative: { agent: a2ui_concierge }
+    red_team_test: { agent: security_sentinel }
+    blue_team_hardening: { agent: security_sentinel }
+    green_team_validation: { agent: security_sentinel }
+    security_summary: { agent: security_sentinel }
+    a2a_negotiation: { agent: commerce, to: vendor_side_agents }
+    ap2_payment:
+      type: Workflow
+      agent: commerce
+      steps:
+        [
+          intent_mandate,
+          negotiate,
+          cart_mandate,
+          hitl_approval,
+          execute_payment,
+          vendor_ack,
+          audit,
+        ]
+    human_review: { agent: human_supervisor }
+
+  a2a:
+    vendor_negotiation:
+      from: commerce
+      to: vendor_side_agents
+      protocol: "quote_request / counter_offer"
+    ap2_payment:
+      from: commerce
+      to: vendor_side_agents
+      protocol: "AP2 intent_mandate / cart_mandate / payment_receipt (simulated JSON)"
+
+  loops:
+    built:
+      - loop1_vendor_evaluator: runtime/loops/loop1_vendor_evaluator.py
+        description: "Quote/vendor evaluator-optimizer with deterministic margin check"
+        guardrails: "Max 5 iterations, deterministic margin, HITL escalation"
+      - loop2_compliance_replan: runtime/loops/loop2_compliance_replan.py
+        description: "Plan → compliance-critic → replan with bounded iterations"
+        guardrails: "Max 3 iterations, deterministic compliance check, A2A handoff"
+      - loop3_kaizen: runtime/loops/loop3_kaizen.py
+        description: "Meta-loop (spec → build → eval → kaizen → spec)"
+        guardrails: "Max 3 iterations, deterministic pytest eval, kaizen log"
+    built_extra:
+      - loop4_route_optimization: runtime/agents/load_planning_agent.py
+        description: "OR-Tools CVRPTW load planning (capacity + time windows)"
+        guardrails: "Deterministic solver, heuristic fallback, never LLM-optimized"
+
+  mcp_server:
+    name: 3pl-orchestrator
+    module: mcp_servers.pl3_server.server
+    transport: stdio
+    namespaces: [rate_card, vendor, policy, telemetry, tms]
+
+  payments:
+    protocol: "AP2 (simulated JSON mandates)"
+    rails: [mock, stripe_test_mode, plaid_sandbox]
+    module: runtime.commerce
+    guardrails: "Live keys hard-blocked; charge only on approved Cart Mandate within cap"
+
+  future_work: "Signed verifiable-credential mandates; UCP wire format; benchmark + perf metrics"

@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightIQ — Quotation Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN TOKENS ═══ */
+:root {
+  --bg:#F6F8FC; --surface:#fff; --surface-2:#F9FAFB;
+  --primary:#4F6BFF; --p10:rgba(79,107,255,.10); --p20:rgba(79,107,255,.20);
+  --secondary:#8FA2FF;
+  --success:#1B9E58; --s10:rgba(27,158,88,.10); --s20:rgba(27,158,88,.20);
+  --warning:#E09000; --w10:rgba(224,144,0,.10);
+  --danger:#D94040;  --d10:rgba(217,64,64,.10);  --d20:rgba(217,64,64,.20);
+  --purple:#6B4FA0;  --pu10:rgba(107,79,160,.10);
+  --text:#111827; --text2:#374151; --muted:#4B5563; --muted2:#6B7280;
+  --border:#E5E9F2; --border2:#D4DAE8;
+  --sh-xs:0 1px 2px rgba(16,24,40,.04);
+  --sh-sm:0 1px 3px rgba(16,24,40,.05),0 1px 2px rgba(16,24,40,.03);
+  --sh:0 6px 20px rgba(16,24,40,.06),0 1px 4px rgba(16,24,40,.03);
+  --sh-lg:0 14px 44px rgba(16,24,40,.09),0 2px 10px rgba(16,24,40,.05);
+  --sh-xl:0 24px 64px rgba(16,24,40,.12);
+  --r-xs:7px; --r-sm:9px; --r:14px; --r-lg:18px; --r-xl:22px; --r-2xl:26px;
+  --nav-h:58px;
+  --transition:all .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═══ RESET ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;
+     font-size:14px;line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4,h5,p{margin:0;}
+a{color:var(--primary);text-decoration:none;}
+a:hover{text-decoration:underline;}
+button,input,select,textarea{font:inherit;}
+img,svg{display:block;}
+
+/* ═══ ACCESSIBILITY ═══ */
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:var(--r-sm);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+
+/* ═══ REDUCED MOTION ═══ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+}
+
+/* ═══ LAYOUT SHELL ═══ */
+.app{display:flex;flex-direction:column;min-height:100vh;}
+
+/* ═══ TOPBAR ═══ */
+.topbar{
+  position:sticky;top:0;z-index:200;height:var(--nav-h);
+  background:rgba(255,255,255,.90);
+  backdrop-filter:blur(20px) saturate(200%);
+  -webkit-backdrop-filter:blur(20px) saturate(200%);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:8px;
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:12px;flex-shrink:0;}
+.brand-mark{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,#4F6BFF 0%,#7B8FFF 100%);
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px;
+  box-shadow:0 2px 8px rgba(79,107,255,.30);
+}
+.brand-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.3px;line-height:1.2;}
+.brand-tag{font-size:10px;color:var(--muted2);line-height:1;}
+
+/* ═══ NAV ═══ */
+.nav{display:flex;align-items:center;flex:1;overflow-x:auto;scrollbar-width:none;gap:0;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-tab{
+  position:relative;display:flex;align-items:center;gap:5px;flex-shrink:0;
+  background:transparent;border:0;color:var(--muted2);
+  font-size:13px;font-weight:500;padding:0 12px;height:var(--nav-h);
+  cursor:pointer;white-space:nowrap;transition:color .15s;
+}
+.nav-tab svg{width:14px;height:14px;flex-shrink:0;opacity:.65;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab:hover svg{opacity:.85;}
+.nav-tab.active{color:var(--primary);font-weight:600;}
+.nav-tab.active svg{opacity:1;}
+.nav-tab.active::after{
+  content:'';position:absolute;bottom:0;left:12px;right:12px;
+  height:2px;background:var(--primary);border-radius:2px 2px 0 0;
+  transform-origin:left center;animation:slideIn .2s ease;
+}
+@keyframes slideIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ═══ TOPBAR RIGHT ═══ */
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--s10);border:1px solid var(--s20);
+  border-radius:999px;padding:4px 10px;
+  font-size:11px;font-weight:600;color:var(--success);
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blink 2.5s infinite;}
+.nav-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--p10);border:1px solid var(--p20);
+  border-radius:999px;padding:4px 10px;
+  font-size:11px;font-weight:600;color:var(--primary);
+}
+.arch-link{
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid var(--border2);border-radius:var(--r-sm);
+  padding:5px 11px;font-size:12px;font-weight:600;color:var(--muted);
+  transition:var(--transition);
+}
+.arch-link:hover{border-color:var(--primary);color:var(--primary);text-decoration:none;}
+.btn-deploy{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#1B9E58,#157A43);
+  color:#fff;border:0;border-radius:var(--r-sm);
+  font-size:12px;font-weight:700;padding:6px 13px;
+  cursor:pointer;box-shadow:0 2px 6px rgba(27,158,88,.28);
+  transition:var(--transition);
+}
+.btn-deploy:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(27,158,88,.38);}
+
+/* ═══ PAGES ═══ */
+.page{display:none;padding:24px 20px;animation:fadeUp .22s ease;}
+.page.active{display:block;}
+.container{max-width:1440px;margin:0 auto;}
+
+/* ═══ PAGE HEADER ═══ */
+.page-header{margin-bottom:24px;}
+.page-title{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.2;}
+.page-sub{font-size:13px;color:var(--muted2);margin-top:5px;line-height:1.5;}
+
+/* ═══ SECTION LABEL ═══ */
+.section-label{
+  font-size:11px;font-weight:700;color:var(--muted2);
+  text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;
+}
+
+/* ═══ CARDS ═══ */
+.card{
+  background:var(--surface);border-radius:var(--r-lg);
+  border:1px solid var(--border);box-shadow:var(--sh-sm);
+}
+/* Only interactive cards lift on hover */
+.card-lift:hover{box-shadow:var(--sh);transform:translateY(-1px);}
+.card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 18px;border-bottom:1px solid var(--border);gap:10px;min-height:52px;
+}
+.card-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.card-sub{font-size:12px;color:var(--muted2);margin-top:2px;line-height:1.4;}
+.card-body{padding:18px;}
+
+/* ═══ BADGES & CHIPS ═══ */
+.badge{
+  display:inline-flex;align-items:center;gap:3px;
+  border-radius:999px;font-size:11px;font-weight:600;
+  padding:3px 8px;white-space:nowrap;line-height:1.3;
+}
+.badge-primary{background:var(--p10);color:var(--primary);}
+.badge-success{background:var(--s10);color:var(--success);}
+.badge-warning{background:var(--w10);color:var(--warning);}
+.badge-danger{background:var(--d10);color:var(--danger);}
+.badge-purple{background:var(--pu10);color:var(--purple);}
+.badge-neutral{background:#F1F3F9;color:var(--muted);}
+/* Legacy chip aliases */
+.chip{display:inline-flex;align-items:center;border-radius:999px;font-size:11px;font-weight:600;padding:3px 8px;white-space:nowrap;}
+.chip.green{background:var(--s10);color:var(--success);}
+.chip.blue{background:var(--p10);color:var(--primary);}
+.chip.yellow{background:var(--w10);color:var(--warning);}
+.chip.red{background:var(--d10);color:var(--danger);}
+.chip.grey{background:#F1F3F9;color:var(--muted);}
+.chip.purple{background:var(--pu10);color:var(--purple);}
+
+/* ═══ BUTTONS ═══ */
+button{cursor:pointer;border:0;border-radius:var(--r-sm);font-weight:600;transition:var(--transition);}
+button:disabled{opacity:.52;cursor:wait;pointer-events:none;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#4F6BFF 0%,#6B7FFF 100%);
+  color:#fff;padding:9px 18px;font-size:13px;font-weight:700;
+  box-shadow:0 2px 8px rgba(79,107,255,.28);
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(79,107,255,.38);}
+.btn-success{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#1B9E58 0%,#157A43 100%);
+  color:#fff;padding:8px 16px;font-size:13px;font-weight:700;
+  box-shadow:0 2px 6px rgba(27,158,88,.22);
+}
+.btn-success:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 12px rgba(27,158,88,.32);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--surface);border:1px solid var(--border2);
+  color:var(--text2);padding:8px 14px;font-size:13px;
+}
+.btn-ghost:hover:not(:disabled){background:var(--bg);border-color:var(--muted2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-icon{width:34px;height:34px;padding:0;display:grid;place-items:center;flex-shrink:0;}
+
+/* ═══ FORM INPUTS ═══ */
+.field-label{
+  display:block;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;
+}
+.input,.select-input{
+  width:100%;height:42px;
+  background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);color:var(--text);
+  padding:0 12px;font-size:14px;font-weight:500;
+  transition:border-color .15s,box-shadow .15s;
+  appearance:none;-webkit-appearance:none;
+}
+.input:focus,.select-input:focus{
+  outline:none;border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(79,107,255,.12);
+}
+.input::placeholder{color:var(--muted2);font-weight:400;}
+
+/* ═══ SKELETON ═══ */
+.skeleton{
+  background:linear-gradient(90deg,#eef0f6 25%,#e4e8f0 50%,#eef0f6 75%);
+  background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:6px;
+}
+
+/* ═══ EMPTY STATES ═══ */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 20px;gap:10px;text-align:center;
+}
+.empty-icon{opacity:.18;color:var(--muted);}
+.empty-title{font-size:14px;font-weight:600;color:var(--text2);margin-top:2px;}
+.empty-body{font-size:12px;color:var(--muted2);max-width:180px;line-height:1.5;}
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:80px;
+  color:var(--muted2);font-size:12px;text-align:center;gap:6px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar" role="banner">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">FQ</div>
+    <div>
+      <div class="brand-name">FreightIQ</div>
+      <div class="brand-tag">ADK Multi-Agent · Kaggle 2026</div>
+    </div>
+  </div>
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-tab active" onclick="showPage('demo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-tab" onclick="showPage('manual')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
+      Before vs After
+    </button>
+    <button class="nav-tab" onclick="showPage('loops')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Loops
+    </button>
+    <button class="nav-tab" onclick="showPage('guardrails')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Guardrails
+    </button>
+    <button class="nav-tab" onclick="showPage('agents')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Agents
+    </button>
+    <button class="nav-tab" onclick="showPage('payments')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      AP2 Pay
+    </button>
+    <button class="nav-tab" onclick="showPage('audit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Audit
+    </button>
+    <button class="nav-tab" onclick="showPage('savings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Time Saved
+    </button>
+    <button class="nav-tab" onclick="showPage('vibe')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Vibe
+    </button>
+    <a class="nav-tab" href="/architecture" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18s-8-2-8-10V4l8-3 8 3v4c0 8-8 10-8 10z"/><path d="M12 12L7 9m5 3l5-3m-5 3v6"/></svg>
+      Architecture
+    </a>    
+  </nav>
+  <div class="topbar-right">
+    <div class="status-badge" id="health-pill" aria-live="polite">
+      <span class="status-dot"></span>
+      <span id="health-txt">Checking…</span>
+    </div>
+    <!-- Google ADK logo badge -->
+    <div class="nav-badge" title="Powered by Google ADK + Vertex AI Gemini 2.0 Flash" style="gap:6px;padding:4px 10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4285F4"/><path d="M12 6.5L8 10h3v7.5h2V10h3L12 6.5z" fill="#fff"/></svg>
+      ADK · Gemini 2.0 Flash
+    </div>
+</header>
+<style>
+/* ═══ DEMO PAGE ═══ */
+.search-card{
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:var(--r-xl);box-shadow:var(--sh-lg);
+  padding:22px 24px;margin-bottom:20px;
+}
+.search-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.search-card-title{font-size:16px;font-weight:700;color:var(--text);}
+.search-grid{display:grid;grid-template-columns:1.4fr 100px 110px 100px 120px auto;gap:10px;align-items:end;}
+.input-wrap{display:flex;flex-direction:column;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.kpi-card{
+  background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);
+  padding:18px 16px;display:flex;align-items:center;gap:14px;
+  box-shadow:var(--sh-sm);position:relative;overflow:hidden;
+  transition:box-shadow .2s,transform .2s;
+}
+.kpi-card:hover{box-shadow:var(--sh);transform:translateY(-1px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r-lg) var(--r-lg) 0 0;}
+.kpi-card.kpi-vendor::before{background:var(--primary);}
+.kpi-card.kpi-rate::before{background:var(--success);}
+.kpi-card.kpi-margin::before{background:var(--warning);}
+.kpi-card.kpi-hitl::before{background:var(--danger);}
+.kpi-icon-wrap{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;flex-shrink:0;}
+.kpi-text{flex:1;min-width:0;}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.kpi-val{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.1;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* Demo 3-col */
+.demo-layout{display:grid;grid-template-columns:248px 1fr 290px;gap:14px;align-items:start;}
+
+/* Queue */
+.queue{display:flex;flex-direction:column;gap:5px;max-height:440px;overflow-y:auto;padding-right:2px;}
+.queue::-webkit-scrollbar{width:3px;}
+.queue::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.s-row{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 11px;cursor:pointer;
+  text-align:left;width:100%;display:flex;flex-direction:column;gap:4px;
+  transition:border-color .15s,background .15s,box-shadow .15s;
+}
+.s-row:hover{border-color:var(--primary);background:#F8F9FF;}
+.s-row.active{border-color:var(--primary);background:var(--p10);box-shadow:0 0 0 2.5px var(--p10);}
+.s-row-top,.s-row-bot{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.sid{font-weight:700;font-size:13px;color:var(--text);}
+.s-lane{font-size:11px;color:var(--muted2);}
+.s-meta{font-size:11px;color:var(--muted2);}
+.filter-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.filter-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px;}
+
+/* Pipeline */
+.pipeline-wrap{display:flex;flex-direction:column;}
+.p-step{
+  display:grid;grid-template-columns:44px 1fr auto;
+  gap:12px;align-items:start;
+  padding:12px 14px;border-radius:var(--r);
+  border:1.5px solid var(--border);background:var(--surface-2);
+  transition:border-color .2s,background .2s;
+}
+.p-step.done{border-color:rgba(27,158,88,.3);background:rgba(27,158,88,.05);}
+.p-step.running{border-color:var(--primary);background:var(--p10);animation:pulseBorder 1.4s infinite;}
+.p-step.skipped{opacity:.5;}
+.p-step.reveal-active{border-color:var(--primary);box-shadow:0 0 0 3px var(--p10);transform:scale(1.015);}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(79,107,255,.15)}50%{box-shadow:0 0 0 4px rgba(79,107,255,.06)}}
+.p-connector{height:12px;margin-left:21px;border-left:2px dashed var(--border2);}
+.p-icon{
+  width:44px;height:44px;border-radius:var(--r-sm);flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#EAECF5;color:var(--muted2);transition:background .2s,color .2s;
+}
+.p-step.done   .p-icon{background:rgba(27,158,88,.18);color:var(--success);}
+.p-step.running .p-icon{background:var(--primary);color:#fff;}
+.p-icon .n{font-size:18px;font-weight:800;line-height:1;}
+.p-icon .lbl{font-size:7px;font-weight:700;text-transform:uppercase;margin-top:2px;opacity:.7;}
+.p-actor{font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.p-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+.p-copy{font-size:11px;color:var(--muted2);margin-top:3px;line-height:1.45;}
+
+/* Handoff row */
+.handoff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+.hcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;}
+.hlbl{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;}
+.hval{font-size:13px;font-weight:700;color:var(--text);margin-top:4px;word-break:break-word;}
+
+/* Decision bar */
+.decision-bar{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);margin-top:18px;padding-top:16px;gap:14px;}
+.decision-price{font-size:34px;font-weight:800;color:var(--primary);letter-spacing:-1px;flex-shrink:0;}
+
+/* Vendor cards */
+.vendor-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;margin-bottom:8px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.vendor-card:last-child{margin-bottom:0;}
+.vendor-card:hover{border-color:var(--p20);box-shadow:var(--sh-xs);}
+.vendor-card.selected-vendor{border-left:3px solid var(--success);padding-left:11px;}
+.vc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.vc-name-row{display:flex;align-items:center;gap:8px;}
+.vc-rank{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.vc-name{font-size:13px;font-weight:700;color:var(--text);}
+.vc-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted2);margin-top:7px;}
+.score-bar{background:var(--bg);border-radius:999px;height:4px;margin-top:9px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .7s cubic-bezier(.4,0,.2,1);}
+
+/* Gates */
+.gate{
+  display:flex;justify-content:space-between;align-items:center;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  padding:9px 12px;margin-bottom:7px;transition:all .15s;
+}
+.gate:last-child{margin-bottom:0;}
+.gate.gate-pass{border-color:rgba(27,158,88,.25);background:rgba(27,158,88,.04);}
+.gate.gate-fail{border-color:rgba(217,64,64,.25);background:rgba(217,64,64,.04);}
+.gate-name{font-size:13px;font-weight:600;color:var(--text);}
+.gate-rule{font-size:11px;color:var(--muted2);margin-top:2px;}
+
+/* JSON box */
+.json-box{
+  background:#0E1525;color:#A5B4FC;
+  font-family:ui-monospace,'Cascadia Code','Fira Code',monospace;
+  font-size:11px;line-height:1.6;max-height:220px;overflow:auto;
+  padding:14px;border-radius:var(--r-sm);white-space:pre-wrap;
+  border:1px solid #1a2540;
+}
+</style>
+<style>
+/* ═══ NON-DEMO PAGE STYLES ═══ */
+/* Compare */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:20px;}
+.compare-col{padding:28px 32px;}
+.compare-col.before{background:linear-gradient(160deg,#FDF5FF,#F8F0FF);border-right:1px solid var(--border);}
+.compare-col.after{background:linear-gradient(160deg,#F0FDF6,#E6FCF0);}
+.compare-head{font-size:17px;font-weight:800;margin-bottom:6px;}
+.before .compare-head{color:#6B4FA0;} .after .compare-head{color:var(--success);}
+.c-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+.c-num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.before .c-num{background:rgba(107,79,160,.14);color:#6B4FA0;}
+.after  .c-num{background:var(--s20);color:var(--success);}
+.c-text{font-size:13px;line-height:1.6;}
+.c-text strong{display:block;font-weight:700;margin-bottom:2px;}
+.compare-footer{font-size:13px;font-weight:700;border-top:1px solid rgba(0,0,0,.06);padding-top:13px;margin-top:8px;}
+
+/* Loop cards */
+.loop-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.loop-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--sh-sm);background:var(--surface);transition:box-shadow .2s,transform .2s;}
+.loop-card.card-lift:hover{box-shadow:var(--sh);transform:translateY(-2px);}
+.loop-card-head{padding:16px 18px;display:flex;align-items:center;gap:12px;}
+.loop-num-badge{width:38px;height:38px;border-radius:var(--r-sm);display:grid;place-items:center;font-size:17px;font-weight:900;color:#fff;flex-shrink:0;}
+.loop-head-text{flex:1;}
+.loop-head-title{font-size:14px;font-weight:700;color:var(--text);}
+.loop-head-sub{font-size:11px;color:var(--muted2);margin-top:2px;}
+.loop-card-body{padding:14px 18px;background:var(--bg);border-top:1px solid var(--border);}
+.loop-algo{font-size:12px;line-height:1.8;color:var(--text2);margin-bottom:10px;}
+.loop-guardrail{font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 11px;color:var(--muted);margin-bottom:12px;line-height:1.6;}
+.loop-card-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.loop-result-area{padding:0 18px 14px;display:none;}
+.loop-result-area.visible{display:block;}
+.loop-result-box{background:var(--s10);border:1px solid var(--s20);border-radius:var(--r-sm);padding:11px 13px;font-size:12px;line-height:1.8;color:var(--text2);}
+.loop-result-box.error{background:var(--d10);border-color:var(--d20);}
+
+/* Kaizen flow */
+.kaizen-flow{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);}
+.kf-step{padding:20px 14px;text-align:center;background:var(--surface);}
+.kf-step:not(:last-child){border-right:1px solid var(--border);}
+.kf-icon-wrap{width:44px;height:44px;border-radius:var(--r);display:grid;place-items:center;margin:0 auto 10px;}
+.kf-title{font-size:13px;font-weight:700;color:var(--text);}
+.kf-desc{font-size:11px;color:var(--muted2);margin-top:4px;line-height:1.5;}
+
+/* Guardrail cards */
+.gr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;}
+.gr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s;}
+.gr-card.card-lift:hover{box-shadow:var(--sh);transform:translateY(-1px);}
+.gr-head{padding:16px 18px;display:flex;align-items:center;gap:12px;}
+.gr-icon-wrap{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;flex-shrink:0;}
+.gr-head-text h3{font-size:14px;font-weight:700;color:var(--text);}
+.gr-head-text p{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.gr-body{padding:14px 18px;border-top:1px solid var(--border);background:var(--bg);font-size:13px;line-height:1.85;color:var(--text2);}
+.gr-body code{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:11px;font-family:ui-monospace,monospace;}
+
+/* A2A */
+.a2a-panel{display:grid;grid-template-columns:1fr 48px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);margin-bottom:18px;}
+.a2a-side{padding:18px 20px;}
+.a2a-broker{background:#F0F5FF;}
+.a2a-vendor{background:rgba(27,158,88,.05);}
+.a2a-mid{display:flex;align-items:center;justify-content:center;background:var(--bg);border-left:1px solid var(--border);border-right:1px solid var(--border);font-size:18px;color:var(--primary);}
+.a2a-side-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.a2a-msg{font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 11px;margin-bottom:7px;line-height:1.6;}
+.a2a-form{display:grid;grid-template-columns:1fr 100px 110px auto;gap:10px;align-items:end;margin-bottom:14px;}
+.ap2-form{display:grid;grid-template-columns:1fr 90px 110px 170px 120px auto;gap:10px;align-items:end;}
+@media(max-width:820px){.ap2-form{grid-template-columns:1fr 1fr;}}
+
+/* ── AP2 Progress Stepper ── */
+.ap2-stepper{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh-sm);}
+.ap2-step{flex:1;display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:12px;font-weight:600;color:var(--muted2);background:transparent;transition:all .3s;border-right:1px solid var(--border);position:relative;}
+.ap2-step:last-child{border-right:0;}
+.ap2-step .ap2-dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--bg);color:var(--muted2);border:1.5px solid var(--border2);flex-shrink:0;transition:all .3s;}
+.ap2-step .ap2-step-label{display:flex;flex-direction:column;gap:1px;}
+.ap2-step .ap2-step-name{font-size:11px;font-weight:700;line-height:1.2;}
+.ap2-step .ap2-step-sub{font-size:10px;color:var(--muted2);font-weight:500;}
+.ap2-step.active{background:var(--p10);color:var(--primary);}
+.ap2-step.active .ap2-dot{background:var(--primary);color:#fff;border-color:var(--primary);animation:pulse 1.2s infinite;}
+.ap2-step.done{background:var(--s10);color:var(--success);}
+.ap2-step.done .ap2-dot{background:var(--success);color:#fff;border-color:var(--success);content:'✓';}
+@media(max-width:900px){.ap2-step .ap2-step-sub{display:none;}.ap2-step{padding:9px 8px;gap:6px;}}
+@media(max-width:600px){.ap2-stepper{flex-wrap:wrap;border-radius:var(--r);}.ap2-step{flex:1 1 40%;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}}
+
+/* ── AP2 Trust / Logo Rail ── */
+.ap2-trust-rail{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);margin-bottom:18px;box-shadow:var(--sh-sm);}
+.ap2-trust-cell{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-right:1px solid var(--border);transition:background .2s;}
+.ap2-trust-cell:last-child{border-right:0;}
+.ap2-trust-cell:hover{background:var(--bg);}
+.ap2-trust-logo{display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ap2-trust-text{display:flex;flex-direction:column;gap:1px;}
+.ap2-trust-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2;}
+.ap2-trust-role{font-size:10px;color:var(--muted2);font-weight:500;}
+.ap2-trust-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;line-height:1.3;}
+@media(max-width:720px){.ap2-trust-rail{flex-direction:column;}.ap2-trust-cell{border-right:0;border-bottom:1px solid var(--border);}.ap2-trust-cell:last-child{border-bottom:0;}}
+
+/* ── AP2 Stage Cards ── */
+.ap2-stage{border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:14px;animation:ap2in .35s ease;overflow:hidden;box-shadow:var(--sh-sm);}
+.ap2-stage-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);gap:10px;}
+.ap2-stage-head-left{display:flex;align-items:center;gap:10px;}
+.ap2-stage-icon{width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;flex-shrink:0;}
+.ap2-stage-title{font-size:13px;font-weight:700;line-height:1.2;}
+.ap2-stage-sub{font-size:11px;color:var(--muted2);margin-top:1px;}
+.ap2-stage-body{padding:14px 16px;}
+.ap2-stage-agent-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;}
+@keyframes ap2in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ── AP2 Mandate Grid ── */
+.ap2-mandate-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+@media(max-width:600px){.ap2-mandate-grid{grid-template-columns:1fr;}}
+.ap2-mandate-card{border:1px solid var(--border);border-radius:var(--r);padding:12px;position:relative;}
+.ap2-mandate-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.ap2-mandate-amount{font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:2px;}
+.ap2-mandate-hash{font-size:10px;color:var(--muted2);font-family:ui-monospace,monospace;margin-top:4px;word-break:break-all;}
+
+/* ── AP2 Payment Card ── */
+.ap2-pay-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;}
+.ap2-pay-amount{font-size:28px;font-weight:900;letter-spacing:-1px;}
+.ap2-pay-rails{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+@media(max-width:600px){.ap2-pay-rails{grid-template-columns:1fr;}}
+.ap2-pay-rail-card{border:1px solid var(--border);border-radius:var(--r);padding:11px;display:flex;align-items:center;gap:10px;}
+.ap2-pay-rail-logo{width:36px;height:36px;border-radius:var(--r-sm);display:grid;place-items:center;flex-shrink:0;}
+.ap2-pay-rail-detail{flex:1;min-width:0;}
+.ap2-pay-rail-name{font-size:12px;font-weight:700;}
+.ap2-pay-rail-info{font-size:11px;color:var(--muted2);margin-top:1px;}
+.ap2-vendor-ack{display:flex;align-items:center;gap:8px;background:var(--s10);border:1px solid var(--s20);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;font-weight:600;color:var(--success);}
+
+/* ── AP2 Narrative Card ── */
+.ap2-narrative-body{font-size:13px;line-height:1.7;color:var(--text2);margin:10px 0;}
+.ap2-takeaway-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;}
+.ap2-takeaway-list li{font-size:12px;padding:6px 10px;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);display:flex;align-items:flex-start;gap:7px;line-height:1.5;}
+.ap2-takeaway-list li::before{content:'→';color:var(--primary);font-weight:800;flex-shrink:0;}
+/* Agent collaboration flow */
+.flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;}
+.flow-node{flex:1;min-width:120px;border:1px solid var(--border);border-radius:var(--r);padding:12px 10px;text-align:center;background:var(--surface);transition:all .35s;opacity:.55;}
+.flow-node.active{opacity:1;border-color:var(--primary);box-shadow:0 0 0 3px var(--p10);transform:translateY(-3px);}
+.flow-node.visited{opacity:1;border-color:var(--s20);}
+.flow-num{width:26px;height:26px;border-radius:50%;margin:0 auto 7px;display:grid;place-items:center;font-size:13px;font-weight:800;background:var(--bg);color:var(--muted2);border:1px solid var(--border);transition:all .35s;}
+.flow-node.active .flow-num{background:var(--primary);color:#fff;border-color:var(--primary);}
+.flow-node.visited .flow-num{background:var(--success);color:#fff;border-color:var(--success);}
+.flow-name{font-size:12px;font-weight:700;}
+.flow-tag{font-size:10px;color:var(--muted2);margin-top:2px;text-transform:uppercase;letter-spacing:.03em;}
+.flow-conn{align-self:center;color:var(--border2);font-weight:800;padding:0 4px;}
+.flow-conn::after{content:'→';}
+@media(max-width:820px){.flow-conn{display:none;}.flow-node{min-width:44%;}}
+.flow-support{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.flow-chip{font-size:11px;font-weight:600;color:var(--muted2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:4px 10px;}
+
+/* Agent graph */
+.agent-graph{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:20px;min-height:360px;overflow:hidden;box-shadow:var(--sh-sm);}
+.broker-node{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--pu10);border:2px solid var(--purple);border-radius:var(--r-lg);padding:14px 20px;text-align:center;min-width:220px;z-index:2;box-shadow:var(--sh);}
+.vendor-node{position:absolute;background:var(--s10);border:1.5px solid var(--s20);border-radius:var(--r);padding:10px 14px;z-index:2;min-width:150px;box-shadow:var(--sh-sm);}
+.vn-name{font-size:12px;font-weight:700;color:var(--text);}
+.vn-meta{font-size:11px;color:var(--muted2);margin-top:2px;}
+
+/* Concepts */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.concept-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh-sm);}
+.concept-card.bonus{background:linear-gradient(135deg,#F5F0FF,#EDE5FF);border-color:var(--purple);}
+.concept-day{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.concept-items{font-size:12px;line-height:1.9;color:var(--muted2);}
+.concept-items code{background:rgba(0,0,0,.05);border-radius:3px;padding:1px 4px;font-size:11px;font-family:ui-monospace,monospace;}
+
+/* Telemetry */
+.tele-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.tele-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;text-align:center;box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s;}
+.tele-card.card-lift:hover{box-shadow:var(--sh);transform:translateY(-1px);}
+.tele-val{font-size:30px;font-weight:800;color:var(--text);margin-top:5px;letter-spacing:-1px;}
+.tele-lbl{font-size:12px;color:var(--muted2);font-weight:500;}
+.tele-note{font-size:11px;color:var(--muted2);margin-top:3px;}
+
+/* Trajectory steps */
+.t-step{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:5px;font-size:13px;transition:all .15s;}
+.t-step.pass{border-color:rgba(27,158,88,.28);background:rgba(27,158,88,.04);}
+.t-step.fail{border-color:rgba(217,64,64,.28);background:rgba(217,64,64,.04);}
+
+/* Eval table */
+.eval-table{width:100%;border-collapse:collapse;}
+.eval-table th,.eval-table td{border-bottom:1px solid var(--border);padding:10px 10px;font-size:13px;text-align:left;}
+.eval-table th{font-size:11px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--bg);padding:9px 10px;}
+.eval-table tbody tr:hover td{background:var(--bg);}
+
+/* Savings */
+.savings-hero{background:linear-gradient(130deg,#1a2d5a 0%,#2a3d8f 40%,#4F6BFF 100%);border-radius:var(--r-xl);padding:36px;color:#fff;text-align:center;margin-bottom:20px;box-shadow:var(--sh-lg);}
+.savings-big{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.sav-card{border-radius:var(--r-lg);padding:22px 18px;text-align:center;border:1px solid var(--border);}
+.sav-num{font-size:44px;font-weight:900;line-height:1;letter-spacing:-2px;}
+.breakdown-table{width:100%;border-collapse:collapse;}
+.breakdown-table th,.breakdown-table td{border-bottom:1px solid var(--border);padding:11px 12px;font-size:13px;text-align:left;}
+.breakdown-table th{font-size:11px;color:var(--muted2);text-transform:uppercase;background:var(--bg);font-weight:600;}
+.saving-cell{background:var(--s10);color:var(--success);font-weight:700;border-radius:5px;padding:3px 8px;font-size:12px;white-space:nowrap;}
+
+/* Vibe */
+.vibe-hero{background:linear-gradient(135deg,#EEF2FF 0%,#F4EFFF 100%);border:1px solid rgba(79,107,255,.18);border-radius:var(--r-xl);padding:26px;margin-bottom:20px;}
+.vibe-input-wrap{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;}
+.vibe-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+.vibe-chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;}
+.vibe-chip:hover{border-color:var(--primary);color:var(--primary);background:var(--p10);}
+.vibe-result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-sm);}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1380px){.search-grid{grid-template-columns:1.2fr 95px 105px 95px 110px auto;}}
+@media(max-width:1200px){
+  .demo-layout{grid-template-columns:230px 1fr;}
+  .demo-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .kpi-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:1024px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .loop-cards{grid-template-columns:1fr 1fr;}
+  .gr-grid{grid-template-columns:1fr 1fr;}
+  .concept-grid{grid-template-columns:repeat(2,1fr);}
+  .search-grid{grid-template-columns:1fr 1fr 1fr;}
+}
+@media(max-width:768px){
+  .topbar{flex-wrap:wrap;height:auto;padding:10px 14px;gap:6px;}
+  .nav{overflow-x:auto;}
+  .page{padding:16px 14px;}
+  .demo-layout{grid-template-columns:1fr;}
+  .demo-right{grid-template-columns:1fr!important;}
+  .compare-grid{grid-template-columns:1fr;}
+  .loop-cards{grid-template-columns:1fr;}
+  .gr-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .savings-big{grid-template-columns:1fr;}
+  .handoff-row{grid-template-columns:1fr 1fr;}
+  .concept-grid{grid-template-columns:1fr;}
+  .tele-grid{grid-template-columns:1fr 1fr;}
+  .kaizen-flow{grid-template-columns:1fr 1fr;}
+  .a2a-panel{grid-template-columns:1fr;}
+  .a2a-mid{border-left:0;border-right:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px;}
+  .search-grid{grid-template-columns:1fr;}
+  .savings-hero{padding:24px 16px;}
+}
+</style>
+
+<!-- ═══ PAGE: DASHBOARD ═══ -->
+<div class="page active" id="page-demo" role="main">
+<div class="container">
+
+  <!-- Search card -->
+  <div class="search-card">
+    <div class="search-card-header">
+      <div>
+        <div class="search-card-title">New Quotation Request</div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:2px;" id="active-shipment">Select a shipment from the queue or enter values manually</div>
+      </div>
+      <span class="badge badge-primary" id="queue-mode">Offline</span>
+    </div>
+    <div class="search-grid">
+      <div class="input-wrap"><label class="field-label" for="lane">Lane</label><input class="input" id="lane" value="Tracy->Fremont" placeholder="Origin → Destination"></div>
+      <div class="input-wrap"><label class="field-label" for="weight">Weight lbs</label><input class="input" id="weight" type="number" value="1000"></div>
+      <div class="input-wrap"><label class="field-label" for="sla">Service Level</label><select class="input select-input" id="sla"><option value="standard">Standard</option><option value="express">Express</option></select></div>
+      <div class="input-wrap"><label class="field-label" for="delivery-time">Delivery hrs</label><input class="input" id="delivery-time" type="number" value="20"></div>
+      <div class="input-wrap"><label class="field-label" for="shipment-id">Shipment ID</label><input class="input" id="shipment-id" value="DEMO-001"></div>
+      <button class="btn-primary" id="run-workflow" style="align-self:end;height:42px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Agents
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-grid" role="region" aria-label="Key performance indicators">
+    <div class="kpi-card kpi-vendor">
+      <div class="kpi-icon-wrap" style="background:var(--p10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="kpi-text"><div class="kpi-label">② Selected Vendor</div><div class="kpi-val" id="kpi-vendor">—</div></div>
+    </div>
+    <div class="kpi-card kpi-rate">
+      <div class="kpi-icon-wrap" style="background:var(--s10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="kpi-text"><div class="kpi-label">③ Customer Rate</div><div class="kpi-val" id="kpi-rate">—</div></div>
+    </div>
+    <div class="kpi-card kpi-margin">
+      <div class="kpi-icon-wrap" style="background:var(--w10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="kpi-text"><div class="kpi-label">③ Margin</div><div class="kpi-val" id="kpi-margin">—</div></div>
+    </div>
+    <div class="kpi-card kpi-hitl">
+      <div class="kpi-icon-wrap" style="background:var(--d10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="kpi-text"><div class="kpi-label">④ HITL Required</div><div class="kpi-val" id="kpi-hitl">—</div></div>
+    </div>
+  </div>
+
+  <!-- 3-col layout -->
+  <div class="demo-layout">
+
+    <!-- Queue -->
+    <aside>
+      <div class="card" style="position:sticky;top:70px;">
+        <div class="card-header">
+          <div><div class="card-title">Load Queue</div><div class="card-sub"><span id="sample-count">0</span> shipments</div></div>
+        </div>
+        <div class="card-body" style="padding:12px;">
+          <div class="filter-row">
+            <div><label class="filter-label" for="lane-filter">Lane</label><select class="input select-input" id="lane-filter" style="height:36px;font-size:12px;"><option value="all">All lanes</option><option value="Tracy->Fremont">Tracy → Fremont</option><option value="Manteca->Hayward">Manteca → Hayward</option></select></div>
+            <div><label class="filter-label" for="sla-filter">SLA</label><select class="input select-input" id="sla-filter" style="height:36px;font-size:12px;"><option value="all">All tiers</option><option value="standard">Standard</option><option value="express">Express</option></select></div>
+          </div>
+          <div class="queue" id="shipment-queue" role="list"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Centre: pipeline -->
+    <section style="display:grid;gap:14px;min-width:0;">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">⑤ Agent Pipeline</div><div class="card-sub">5-step autonomous tool call sequence</div></div>
+          <span class="badge badge-success" id="agent-mode-chip">Ready</span>
+        </div>
+        <div class="card-body" style="padding:14px 16px;">
+          <div class="pipeline-wrap" id="pipeline"></div>
+          <div class="handoff-row">
+            <div class="hcard"><div class="hlbl">Customer promise</div><div class="hval" id="h-promise">—</div></div>
+            <div class="hcard"><div class="hlbl">Carrier cover</div><div class="hval" id="h-cover">—</div></div>
+            <div class="hcard"><div class="hlbl">Dispatch outcome</div><div class="hval" id="h-outcome">—</div></div>
+          </div>
+          <div class="decision-bar">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:15px;font-weight:700;line-height:1.3;" id="decision-title">Run a shipment to see the agent decision</div>
+              <div style="font-size:12px;color:var(--muted2);margin-top:5px;line-height:1.5;" id="decision-copy">Orchestrates: sanitize → rank → quote → comply → evaluate</div>
+            </div>
+            <div class="decision-price" id="decision-price">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right -->
+    <div class="demo-right" style="display:grid;gap:14px;align-content:start;">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">② Carrier Decision</div><div class="card-sub">VS — 70% reliability / 30% cost</div></div></div>
+        <div class="card-body" style="padding:14px;"><div id="vendor-list"><div class="empty-state"><svg class="empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><div class="empty-title">No carriers yet</div><div class="empty-body">Run a shipment to see vendor ranking</div></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">④ Risk &amp; Approval Gates</div><div class="card-sub">HITL Escalation Gate</div></div></div>
+        <div class="card-body" style="padding:14px;"><div id="compliance-list"><div class="empty-state"><svg class="empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div class="empty-title">No compliance data</div><div class="empty-body">Compliance status appears after a run</div></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">⑤ Audit Evidence</div><div class="card-sub">Full agent payload</div></div></div>
+        <div class="card-body" style="padding:14px;"><pre class="json-box" id="raw-json">{}</pre></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ═══ PAGE: BEFORE VS AFTER ═══ -->
+<div class="page" id="page-manual"><div class="container" style="max-width:1060px;">
+  <div class="page-header"><h1 class="page-title">Before vs After</h1><p class="page-sub">How AI transforms the 3PL quotation process from hours to seconds</p></div>
+  <div class="compare-grid">
+    <div class="compare-col before">
+      <div class="compare-head">Manual Desk — Before</div>
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:18px;">Dispatcher, pricing analyst, and ops manager working in silos</div>
+      <div class="c-step"><div class="c-num">1</div><div class="c-text"><strong>Customer calls or emails</strong>Rep manually checks rate spreadsheet. 15–45 min.</div></div>
+      <div class="c-step"><div class="c-num">2</div><div class="c-text"><strong>Dispatcher calls carriers</strong>Phone/email 3–5 vendors, waits for replies. 1–4 hours.</div></div>
+      <div class="c-step"><div class="c-num">3</div><div class="c-text"><strong>Pricing analyst runs numbers</strong>Margin checked in Excel. Error-prone. 20–60 min.</div></div>
+      <div class="c-step"><div class="c-num">4</div><div class="c-text"><strong>Manager reviews every load</strong>Signs off on all quotes. Bottleneck. 30–60 min.</div></div>
+      <div class="c-step"><div class="c-num">5</div><div class="c-text"><strong>Quote sent to customer</strong>After 3–8 hours of elapsed time.</div></div>
+      <div class="compare-footer" style="color:#6B4FA0;">⏱ 3–8 hours · High error risk · Manager bottleneck</div>
+    </div>
+    <div class="compare-col after">
+      <div class="compare-head">Agentic AI — After</div>
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:18px;">QuotationDecisionAgent orchestrates all five steps autonomously</div>
+      <div class="c-step"><div class="c-num">1</div><div class="c-text"><strong>Request ingested via API</strong>TMS/portal → FastAPI. Agent starts. &lt;1 sec.</div></div>
+      <div class="c-step"><div class="c-num">2</div><div class="c-text"><strong>VS Vendor Scorer ranks carriers</strong>MCP vendor.rank_for_lane — 70/30. &lt;1 sec.</div></div>
+      <div class="c-step"><div class="c-num">3</div><div class="c-text"><strong>QE Quotation Engine prices load</strong>vendor_cost ÷ (1−0.12). Deterministic. &lt;1 sec.</div></div>
+      <div class="c-step"><div class="c-num">4</div><div class="c-text"><strong>Compliance gate auto-checks</strong>Margin/SLA/Weight. Only exceptions escalate. &lt;1 sec.</div></div>
+      <div class="c-step"><div class="c-num">5</div><div class="c-text"><strong>Quote ready — or HITL flagged</strong>Routine loads dispatch automatically. &lt;3 sec total.</div></div>
+      <div class="compare-footer" style="color:var(--success);">⚡ &lt;3 seconds · Deterministic · Only exceptions escalate</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;text-align:center;box-shadow:var(--sh-sm);"><div style="font-size:38px;font-weight:900;color:var(--primary);letter-spacing:-2px;">99.9%</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Time reduction</div><div style="font-size:12px;color:var(--muted2);margin-top:3px;">3–8 hrs → &lt;3 seconds</div></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;text-align:center;box-shadow:var(--sh-sm);"><div style="font-size:38px;font-weight:900;color:var(--success);letter-spacing:-2px;">~80%</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Manual touches eliminated</div><div style="font-size:12px;color:var(--muted2);margin-top:3px;">Only HITL-flagged loads need review</div></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;text-align:center;box-shadow:var(--sh-sm);"><div style="font-size:38px;font-weight:900;color:var(--warning);letter-spacing:-2px;">0</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Margin calculation errors</div><div style="font-size:12px;color:var(--muted2);margin-top:3px;">Python math, never LLM arithmetic</div></div>
+  </div>
+</div></div>
+
+<!-- ═══ PAGE: LOOPS ═══ -->
+<div class="page" id="page-loops"><div class="container" style="max-width:1060px;">
+  <div class="page-header"><h1 class="page-title">Autonomous Loop Engineering</h1><p class="page-sub">Three bounded self-improvement loops with deterministic guardrails and maximum iteration counts</p></div>
+  <div class="loop-cards">
+    <div class="loop-card card-lift">
+      <div class="loop-card-head" style="background:linear-gradient(135deg,rgba(27,158,88,.06),rgba(27,158,88,.02));">
+        <div class="loop-num-badge" style="background:var(--success);">1</div>
+        <div class="loop-head-text"><div class="loop-head-title">Vendor Evaluator Loop</div><div class="loop-head-sub">MCP: rate_card + vendor · Max 5 iterations</div></div>
+      </div>
+      <div class="loop-card-body">
+        <div class="loop-algo">1. MCP ranks all vendors (70% reliability / 30% cost)<br>2. Pick next untried candidate<br>3. Compute margin deterministically (Python only)<br>4. If margin ≥ 12% + reliability ≥ 85% → select<br>5. Else: mark tried, shrink set, continue</div>
+        <div class="loop-guardrail">🛡 Max 5 iterations · Tried-set prevents cycling · HITL if margin gap &gt; 2%</div>
+      </div>
+      <div class="loop-card-footer">
+        <button class="btn-success btn-sm" onclick="runLoop(1)"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Loop 1</button>
+        <span class="badge badge-neutral" id="l1-status">Not run</span>
+      </div>
+      <div class="loop-result-area" id="l1-result"></div>
+    </div>
+    <div class="loop-card card-lift">
+      <div class="loop-card-head" style="background:linear-gradient(135deg,rgba(224,144,0,.07),rgba(224,144,0,.02));">
+        <div class="loop-num-badge" style="background:var(--warning);">2</div>
+        <div class="loop-head-text"><div class="loop-head-title">Compliance-Critic Loop</div><div class="loop-head-sub">MCP: policy · Max 3 iterations</div></div>
+      </div>
+      <div class="loop-card-body">
+        <div class="loop-algo">1. Generate initial assignment plan<br>2. Check compliance: margin / SLA / weight<br>3. If violations: replan (next vendor / express / split)<br>4. Repeat max 3 rounds<br>5. Escalate to HITL if still violating</div>
+        <div class="loop-guardrail">🛡 Max 3 iterations · Deterministic compliance · A2A handoff on escalation</div>
+      </div>
+      <div class="loop-card-footer">
+        <button class="btn-success btn-sm" onclick="runLoop(2)"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Loop 2</button>
+        <span class="badge badge-neutral" id="l2-status">Not run</span>
+      </div>
+      <div class="loop-result-area" id="l2-result"></div>
+    </div>
+    <div class="loop-card card-lift">
+      <div class="loop-card-head" style="background:linear-gradient(135deg,rgba(107,79,160,.07),rgba(107,79,160,.02));">
+        <div class="loop-num-badge" style="background:var(--purple);">3</div>
+        <div class="loop-head-text"><div class="loop-head-title">Kaizen Meta-Loop</div><div class="loop-head-sub">MCP: telemetry · Max 3 cycles</div></div>
+      </div>
+      <div class="loop-card-body">
+        <div class="loop-algo">1. Run pytest trajectory tests<br>2. Classify failures by pattern<br>3. Auto-refine: adjust config.yaml + rewrite Gherkin<br>4. Re-run tests to verify improvement<br>5. Log all changes to kaizen_log.md</div>
+        <div class="loop-guardrail">🛡 Max 3 cycles · Pattern-based auto-refinement · All changes logged with diff</div>
+      </div>
+      <div class="loop-card-footer">
+        <button class="btn-success btn-sm" onclick="runLoop(3)"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Loop 3</button>
+        <span class="badge badge-neutral" id="l3-status">Not run</span>
+      </div>
+      <div class="loop-result-area" id="l3-result"></div>
+    </div>
+  </div>
+  <div class="section-label">Kaizen cycle — spec → eval → classify → refine</div>
+  <div class="kaizen-flow">
+    <div class="kf-step"><div class="kf-icon-wrap" style="background:#EEF2FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="kf-title">Spec</div><div class="kf-desc">Gherkin features define expected agent behaviour</div></div>
+    <div class="kf-step"><div class="kf-icon-wrap" style="background:var(--s10);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="kf-title">Eval</div><div class="kf-desc">pytest trajectory tests run against live agent</div></div>
+    <div class="kf-step"><div class="kf-icon-wrap" style="background:var(--w10);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="kf-title">Classify</div><div class="kf-desc">Failure patterns auto-detected</div></div>
+    <div class="kf-step"><div class="kf-icon-wrap" style="background:var(--pu10);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="kf-title">Refine</div><div class="kf-desc">config.yaml + Gherkin auto-updated</div></div>
+  </div>
+</div></div>
+
+<!-- ═══ PAGE: GUARDRAILS ═══ -->
+<div class="page" id="page-guardrails"><div class="container" style="max-width:1060px;">
+  <div class="page-header"><h1 class="page-title">Agentic Guardrails</h1><p class="page-sub">Four protection layers preventing bad automation decisions before they reach customers</p></div>
+  <div class="gr-grid">
+    <div class="gr-card card-lift"><div class="gr-head" style="background:rgba(27,158,88,.05);"><div class="gr-icon-wrap" style="background:var(--s20);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="gr-head-text"><h3>Margin Protection</h3><p style="color:var(--success);">Deterministic · QuotationEngine</p></div></div><div class="gr-body"><strong>Rule:</strong> <code>customer_price = vendor_cost ÷ (1 − 0.12)</code> — 12% floor in Python, never LLM<br><strong>Trigger:</strong> margin &lt; 12% → Loop 1 tries next vendor → HITL if all fail<br><strong>Proof:</strong> <code>test_margin_is_floor_not_rate_card_tautology</code></div></div>
+    <div class="gr-card card-lift"><div class="gr-head" style="background:rgba(107,79,160,.05);"><div class="gr-icon-wrap" style="background:rgba(107,79,160,.18);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="gr-head-text"><h3>Prompt Injection Defense</h3><p style="color:var(--purple);">Security · VendorTextSanitizer</p></div></div><div class="gr-body"><strong>Runs first:</strong> every vendor text sanitized before entering agent context<br><strong>Detects:</strong> ignore_instructions · system_override · role_override · jailbreak · delimiter_injection<br><strong>If flagged:</strong> text redacted → HITL triggered immediately</div></div>
+    <div class="gr-card card-lift"><div class="gr-head" style="background:rgba(217,64,64,.04);"><div class="gr-icon-wrap" style="background:var(--d20);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="gr-head-text"><h3>HITL Escalation Gate</h3><p style="color:var(--danger);">Threshold-based · Not an Agent</p></div></div><div class="gr-body">① Margin &lt; 12% — low margin protection violation<br>② Load value ≥ $10,000 — high-value load<br>③ Compliance check failed (any of 3 policies)<br>④ Vendor text flagged by sanitizer<br><strong>Routine loads dispatch automatically.</strong></div></div>
+    <div class="gr-card card-lift"><div class="gr-head" style="background:var(--p10);"><div class="gr-icon-wrap" style="background:var(--p20);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="gr-head-text"><h3>Trajectory Evaluator</h3><p style="color:var(--primary);">8-step Gherkin assertions</p></div></div><div class="gr-body">① vendor_quotes_gathered · ② vendor_selected (score &gt; 0)<br>③ customer_quote_computed (rate &gt; 0) · ④ margin_from_selected_vendor<br>⑤ margin_protection ≥ 12% · ⑥ compliance_checked<br>⑦ hitl_gate_evaluated · ⑧ vendor_text_sanitized (conditional)</div></div>
+  </div>
+  <div class="section-label" style="margin-top:8px;">A2A Vendor Negotiation — Broker ↔ Vendor Agents</div>
+  <div class="a2a-panel">
+    <div class="a2a-side a2a-broker">
+      <div class="a2a-side-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Broker Agent</div>
+      <div class="a2a-msg">📤 <strong>QuoteRequest</strong><br>lane: Tracy→Fremont · target: $320 · rounds: 3</div>
+      <div class="a2a-msg" style="background:var(--s10);border-color:var(--s20);">📥 <strong>Agreement Reached</strong><br>FalconFreight V002 · $320.00 · Reliability 95</div>
+    </div>
+    <div class="a2a-mid">⇄</div>
+    <div class="a2a-side a2a-vendor">
+      <div class="a2a-side-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/></svg>Vendor Agents (3 carriers)</div>
+      <div class="a2a-msg">SwiftTransport V001 — $300 ✓</div>
+      <div class="a2a-msg" style="background:var(--s10);border-color:var(--s20);"><strong>FalconFreight V002 — $320 ✓ SELECTED</strong><br>Highest reliability wins</div>
+      <div class="a2a-msg">EcoHaul V003 — $285 ✓</div>
+    </div>
+  </div>
+  <div class="a2a-form">
+    <div class="input-wrap"><label class="field-label" for="a2a-lane">Lane</label><input class="input" id="a2a-lane" value="Tracy->Fremont"></div>
+    <div class="input-wrap"><label class="field-label" for="a2a-weight">Weight</label><input class="input" id="a2a-weight" type="number" value="1000"></div>
+    <div class="input-wrap"><label class="field-label" for="a2a-sla">SLA</label><select class="input select-input" id="a2a-sla"><option value="standard">Standard</option><option value="express">Express</option></select></div>
+    <button class="btn-primary btn-sm" onclick="runA2A()" style="align-self:end;height:42px;white-space:nowrap;">Run A2A</button>
+  </div>
+  <div id="a2a-result"><div class="empty-state"><svg class="empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg><div class="empty-title">Run A2A negotiation</div><div class="empty-body">Broker ↔ vendor exchange will appear here</div></div></div>
+</div></div>
+
+<!-- ═══ PAGE: AGENTS ═══ -->
+<div class="page" id="page-agents"><div class="container" style="max-width:1060px;">
+  <div class="page-header"><h1 class="page-title">Agent System</h1><p class="page-sub">Multi-agent collaboration with A2A negotiation, AP2 payments, and A2UI presentation — orchestrated on Google ADK</p></div>
+
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-header"><div class="card-title">Multi-Agent Collaboration — Start to Finish</div><button class="btn-primary btn-sm" onclick="playAgentFlow()">▶ Play collaboration</button></div>
+    <div class="card-body">
+      <div class="flow" id="agent-flow">
+        <div class="flow-node" data-cap="OrchestratorAgent routes the natural-language request to the right workflow."><div class="flow-num">1</div><div class="flow-name">🧭 Orchestrator</div><div class="flow-tag">NL routing</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="QuotationDecisionAgent ranks carriers (70/30) and computes the margin-safe quote."><div class="flow-num">2</div><div class="flow-name">🤖 QuotationDecision</div><div class="flow-tag">quote + rank</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="A2A: broker and carrier agents exchange counter-offers until they agree."><div class="flow-num">3</div><div class="flow-name">🤝 A2A Vendors</div><div class="flow-tag">negotiate</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="CommerceAgent issues the Intent Mandate and locks the Cart Mandate (AP2)."><div class="flow-num">4</div><div class="flow-name">💳 CommerceAgent</div><div class="flow-tag">AP2 mandates</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="HumanSupervisorAgent produces a structured summary and gates high-risk loads (HITL)."><div class="flow-num">5</div><div class="flow-name">🔔 HumanSupervisor</div><div class="flow-tag">HITL approve</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="AP2 payment executes on Stripe test-mode, funded via Plaid — the vendor receives it."><div class="flow-num">6</div><div class="flow-name">🏦 Stripe + Plaid</div><div class="flow-tag">AP2 pay</div></div>
+        <div class="flow-conn"></div>
+        <div class="flow-node" data-cap="A2UIConciergeAgent turns the whole run into an audience-tailored narrative for the UI."><div class="flow-num">7</div><div class="flow-name">🖥 A2UIConcierge</div><div class="flow-tag">A2UI</div></div>
+      </div>
+      <div id="flow-caption" style="margin-top:12px;font-size:13px;color:var(--muted2);min-height:20px;">Press ▶ to watch the agents hand off work from request to paid contract.</div>
+      <div class="flow-support">
+        <span class="flow-chip">📊 OperationsInsight</span><span class="flow-chip">🚚 LoadPlanning (OR-Tools)</span><span class="flow-chip">🛡 SecuritySentinel (red/blue/green)</span>
+        <span style="font-size:11px;color:var(--muted2);align-self:center;">— always-on supporting agents</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="agent-graph" aria-label="Agent network diagram">
+    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;" aria-hidden="true">
+      <defs><marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--primary)" opacity=".45"/></marker></defs>
+      <line x1="50%" y1="44%" x2="18%" y2="18%" stroke="var(--primary)" stroke-width="1.5" opacity=".35" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+      <line x1="50%" y1="44%" x2="82%" y2="18%" stroke="var(--primary)" stroke-width="1.5" opacity=".35" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+      <line x1="50%" y1="56%" x2="50%" y2="80%" stroke="var(--primary)" stroke-width="1.5" opacity=".35" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+    </svg>
+    <div class="broker-node">
+      <div style="font-size:14px;font-weight:800;color:var(--purple);">QuotationDecisionAgent</div>
+      <div style="font-size:11px;color:var(--muted2);margin-top:4px;">Central ADK orchestrator · Gemini 1.5 Pro</div>
+      <div style="margin-top:9px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap;">
+        <span class="badge badge-purple">Google ADK</span><span class="badge badge-primary">Gemini</span>
+      </div>
+    </div>
+    <div class="vendor-node" style="top:10%;left:4%;"><div class="vn-name">SwiftTransport (V001)</div><div class="vn-meta">Reliability 92 · Floor 8%</div></div>
+    <div class="vendor-node" style="top:10%;right:4%;"><div class="vn-name">FalconFreight (V002)</div><div class="vn-meta">Reliability 95 · Floor 10%</div></div>
+    <div class="vendor-node" style="bottom:10%;left:50%;transform:translateX(-50%);"><div class="vn-name">EcoHaul (V003)</div><div class="vn-meta">Reliability 88 · Floor 6%</div></div>
+  </div>
+  <div class="section-label">Multi-Agent Fleet — 8 Specialized Agents</div>
+  <div class="concept-grid">
+    <div class="concept-card"><div class="concept-day" style="color:var(--purple);">🤖 QuotationDecisionAgent</div><div class="concept-items">ADK + Gemini · vendor selection, margin quote, compliance, HITL. Skills: vendor_quotation, customer_quotation, compliance_and_risk.</div></div>
+    <div class="concept-card"><div class="concept-day" style="color:var(--primary);">📊 OperationsInsightAgent</div><div class="concept-items">Warehouse-flow bottlenecks, dwell prediction, vendor reliability, pallet readiness. Endpoints: <code>/api/operations-insight</code>, <code>/api/vendor-reliability</code>.</div></div>
+    <div class="concept-card"><div class="concept-day" style="color:var(--success);">🚚 LoadPlanningAgent</div><div class="concept-items">OR-Tools CVRPTW — capacity + time-window constrained routing with heuristic fallback. Endpoint: <code>/api/load-plan</code>.</div></div>
+    <div class="concept-card"><div class="concept-day" style="color:var(--warning);">🖥 A2UIConciergeAgent</div><div class="concept-items">Audience-specific dashboards + narrative summaries (Agent-to-UI). Endpoints: <code>/api/generate-dashboard</code>, <code>/api/generate-narrative</code>.</div></div>
+    <div class="concept-card"><div class="concept-day" style="color:var(--danger);">🛡 SecuritySentinelAgent</div><div class="concept-items">Red / blue / green team testing, hardening, continuous validation. Endpoints: <code>/api/red-team-test</code>, <code>/api/blue-team-hardening</code>, <code>/api/green-team-validation</code>.</div></div>
+    <div class="concept-card bonus"><div class="concept-day" style="color:var(--purple);">💳 CommerceAgent (AP2)</div><div class="concept-items">Intent/Cart mandates, A2A negotiation, human approval, Stripe test-mode + Plaid sandbox payment. Endpoint: <code>/api/ap2-payment</code> · <button class="btn-primary btn-sm" style="margin-top:7px;" onclick="showPage('payments')">Try AP2 →</button></div></div>
+    <div class="concept-card"><div class="concept-day" style="color:var(--danger);">🔔 HumanSupervisorAgent</div><div class="concept-items">Structured HITL summaries — action, rationale, key metrics, recommendation, reversibility. Endpoint: <code>/api/human-review</code>.</div></div>
+    <div class="concept-card"><div class="concept-day">🧭 OrchestratorAgent</div><div class="concept-items">Routes natural-language requests to the correct workflow. Endpoint: <code>/api/orchestrate</code>, <code>/api/vibe</code>.</div></div>
+  </div>
+
+  <div class="section-label">5-Day Course — Full Implementation Coverage</div>
+  <div class="concept-grid">
+    <div class="concept-card"><div class="concept-day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Day 1 — Foundation</div><div class="concept-items">✅ Agent definition: <code>.agy</code> YAML + ADK Agent<br>✅ System instructions from <code>quotation_decision.agy</code><br>✅ 4 ADK tools (rank/quote/comply/sanitize)<br>✅ MCP tool_registry → external data</div></div>
+    <div class="concept-card"><div class="concept-day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Day 2 — Multi-Agent</div><div class="concept-items">✅ OrchestratorAgent routes to sub-workflows<br>✅ NL → structured params → workflow<br>✅ A2A: QuoteRequest / QuoteOffer protocol<br>✅ Pydantic inter-agent data passing</div></div>
+    <div class="concept-card"><div class="concept-day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Day 3 — Output &amp; Safety</div><div class="concept-items">✅ Pydantic <code>QuotationResult</code> validates outputs<br>✅ Field validators: pricing_basis, margin floor<br>✅ VendorTextSanitizer: 6 injection patterns<br>✅ HITL gate blocks auto-dispatch on any flag</div></div>
+    <div class="concept-card"><div class="concept-day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Day 4 — Eval &amp; Memory</div><div class="concept-items">✅ 77 unit + trajectory tests via pytest<br>✅ 8-step Gherkin trajectory assertions<br>✅ InSessionMemory + ShipmentHistoryStore<br>✅ AgentContextBuffer injects history</div></div>
+    <div class="concept-card"><div class="concept-day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Day 5 — Deploy &amp; MCP</div><div class="concept-items">✅ Cloud Run deploy.sh — 8-step one-click<br>✅ GitHub Actions CI/CD pipeline<br>✅ MCP stdio JSON-RPC, 5 namespaces<br>✅ In-process + stdio subprocess client</div></div>
+    <div class="concept-card bonus"><div class="concept-day" style="color:var(--purple);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bonus — Vibe Coding</div><div class="concept-items">✅ <code>/api/vibe</code>: plain English → routed workflow<br>✅ OrchestratorAgent: NL routing offline + LLM<br>✅ Parameter extraction from natural language<br>✅ <button class="btn-primary btn-sm" style="margin-top:7px;" onclick="showPage('vibe')">Try Vibe →</button></div></div>
+  </div>
+</div></div>
+
+<!-- ═══ PAGE: AP2 PAYMENT ═══ -->
+<div class="page" id="page-payments"><div class="container" style="max-width:1060px;">
+  <div class="page-header"><h1 class="page-title">Live Multi-Agent Demo — Quote → Contract → AP2 Payment</h1><p class="page-sub">Watch the agents collaborate end-to-end: <strong>A2A</strong> vendor negotiation → contract lock (Cart Mandate) → human approval → <strong>AP2</strong> payment via Stripe + Plaid → <strong>A2UI</strong> narrative. Stripe test-mode + Plaid sandbox — no real money.</p></div>
+
+  <div id="ap2-stepper" class="ap2-stepper" style="display:none;">
+    <div class="ap2-step" data-step="quote"><span class="ap2-dot">1</span><span>Quotation</span></div>
+    <div class="ap2-step" data-step="a2a"><span class="ap2-dot">2</span><span>A2A Negotiation</span></div>
+    <div class="ap2-step" data-step="contract"><span class="ap2-dot">3</span><span>Contract Lock</span></div>
+    <div class="ap2-step" data-step="pay"><span class="ap2-dot">4</span><span>AP2 Payment</span></div>
+    <div class="ap2-step" data-step="a2ui"><span class="ap2-dot">5</span><span>A2UI Summary</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header"><div class="card-title">Run AP2 Payment Flow</div><span class="badge badge-purple" id="ap2-mode">mode: —</span></div>
+    <div class="card-body">
+      <div class="ap2-form">
+        <div class="input-wrap"><label class="field-label" for="ap2-lane">Lane</label><input class="input" id="ap2-lane" value="Tracy->Fremont"></div>
+        <div class="input-wrap"><label class="field-label" for="ap2-weight">Weight</label><input class="input" id="ap2-weight" type="number" value="1000"></div>
+        <div class="input-wrap"><label class="field-label" for="ap2-sla">SLA</label><select class="input select-input" id="ap2-sla"><option value="standard">Standard</option><option value="express">Express</option></select></div>
+        <div class="input-wrap"><label class="field-label" for="ap2-funding">Funding</label><select class="input select-input" id="ap2-funding"><option value="card">💳 Card (Stripe)</option><option value="ach">🏦 ACH bank (Plaid→Stripe)</option></select></div>
+        <div class="input-wrap"><label class="field-label" for="ap2-approve">Human approval</label><select class="input select-input" id="ap2-approve"><option value="true">Approved</option><option value="false">Withhold</option></select></div>
+        <button class="btn-primary btn-sm" onclick="runAP2()" style="align-self:end;height:42px;white-space:nowrap;">▶ Run Full Demo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ap2-result"><div class="empty-state"><svg class="empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="empty-title">Run an AP2 payment</div><div class="empty-body">Intent Mandate → negotiation → Cart Mandate → approval → vendor receives payment</div></div></div>
+</div></div>
+
+<!-- ═══ PAGE: AUDIT ═══ -->
+<div class="page" id="page-audit"><div class="container" style="max-width:1060px;">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div><h1 class="page-title">Audit Trail</h1><p class="page-sub">Every agent decision is fully traceable — tools called, vendor selected, compliance checked</p></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" onclick="loadTelemetry()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg>Refresh</button>
+      <button class="btn-primary btn-sm" id="btn-eval"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run 20-case eval</button>
+    </div>
+  </div>
+  <div class="tele-grid">
+    <div class="tele-card card-lift"><div class="tele-lbl">Shipments Today</div><div class="tele-val" id="tele-ships">—</div><div class="tele-note">via MCP telemetry</div></div>
+    <div class="tele-card card-lift"><div class="tele-lbl">On-Time Rate</div><div class="tele-val" id="tele-ontime" style="color:var(--success);">—</div><div class="tele-note">last 30 days</div></div>
+    <div class="tele-card card-lift"><div class="tele-lbl">Avg Margin %</div><div class="tele-val" id="tele-margin" style="color:var(--warning);">—</div><div class="tele-note">above 12% floor</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+    <div class="card"><div class="card-header"><div class="card-title">8-Step Trajectory — Last Run</div></div><div class="card-body" style="padding:12px;"><div id="trajectory-steps"><div class="empty-state"><svg class="empty-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div class="empty-title">No trajectory data</div><div class="empty-body">Run a shipment on the Dashboard tab first</div></div></div></div></div>
+    <div class="card"><div class="card-header"><div><div class="card-title">Tool Trace</div><div class="card-sub">LLM tool call sequence</div></div></div><div class="card-body" style="padding:12px;"><div id="tool-trace-list"><div class="empty-state"><svg class="empty-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><div class="empty-title">No tool trace</div><div class="empty-body">Run a shipment to see which tools the LLM called</div></div></div><div style="margin-top:12px;font-size:11px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">MCP telemetry payload</div><pre class="json-box" id="tele-raw" style="max-height:130px;">{}</pre></div></div>
+  </div>
+  <div class="card" style="overflow:auto;">
+    <div class="card-header"><div><div class="card-title">Batch Evaluation</div><div class="card-sub" id="eval-summary">Run batch evaluation to see pass/fail rates across 20 deterministic shipments</div></div></div>
+    <div style="overflow:auto;"><table class="eval-table"><thead><tr><th>#</th><th>Shipment</th><th>Lane</th><th>Vendor</th><th>Rate</th><th>Margin</th><th>Compliance</th><th>HITL</th><th>Trajectory</th></tr></thead><tbody id="eval-body"><tr><td colspan="9" style="padding:24px;text-align:center;color:var(--muted2);">Click "Run 20-case eval" to populate results</td></tr></tbody></table></div>
+  </div>
+</div></div>
+
+<!-- ═══ PAGE: TIME SAVED ═══ -->
+<div class="page" id="page-savings"><div class="container" style="max-width:1060px;">
+  <div class="savings-hero">
+    <h2 style="font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:10px;">⏱ 3–8 Hours → &lt;3 Seconds</h2>
+    <p style="font-size:14px;opacity:.85;line-height:1.65;max-width:560px;margin:0 auto;">One API call replaces five manual steps across four business domains. Only edge cases escalate — routine loads dispatch automatically.</p>
+  </div>
+  <div class="savings-big">
+    <div class="sav-card" style="background:linear-gradient(135deg,#FEFCE8,#FEF3C7);border-color:#FDE68A;"><div class="sav-num" style="color:#92700A;">99.9%</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Time reduction</div><div style="font-size:11px;color:var(--muted2);margin-top:3px;">3–8 hrs → &lt;3 seconds</div></div>
+    <div class="sav-card" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-color:#86EFAC;"><div class="sav-num" style="color:var(--success);">~80%</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Manual touches eliminated</div><div style="font-size:11px;color:var(--muted2);margin-top:3px;">Only HITL-flagged loads need review</div></div>
+    <div class="sav-card" style="background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-color:#A5B4FC;"><div class="sav-num" style="color:var(--primary);">0</div><div style="font-size:13px;font-weight:600;margin-top:5px;">Margin errors</div><div style="font-size:11px;color:var(--muted2);margin-top:3px;">Deterministic Python math</div></div>
+  </div>
+  <div class="section-label">Step-by-step comparison</div>
+  <div class="card" style="overflow:auto;margin-bottom:16px;">
+    <table class="breakdown-table">
+      <thead><tr><th>#</th><th>Business Step</th><th>Domain</th><th style="color:#6B4FA0;">Before</th><th style="color:var(--success);">After (Agent)</th><th>Saved</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--muted2);font-weight:600;">1</td><td><strong>Request intake &amp; rate lookup</strong></td><td><span class="badge badge-neutral">Customer Desk</span></td><td style="color:#6B4FA0;font-weight:700;">15–45 min</td><td style="color:var(--success);font-weight:700;">&lt;1 sec</td><td><span class="saving-cell">~30 min</span></td></tr>
+        <tr><td style="color:var(--muted2);font-weight:600;">2</td><td><strong>Carrier sourcing &amp; ranking</strong></td><td><span class="badge badge-neutral">Carrier Procurement</span></td><td style="color:#6B4FA0;font-weight:700;">1–4 hours</td><td style="color:var(--success);font-weight:700;">&lt;1 sec</td><td><span class="saving-cell">~2.5 hrs</span></td></tr>
+        <tr><td style="color:var(--muted2);font-weight:600;">3</td><td><strong>Customer pricing &amp; margin</strong></td><td><span class="badge badge-neutral">Pricing Desk</span></td><td style="color:#6B4FA0;font-weight:700;">20–60 min</td><td style="color:var(--success);font-weight:700;">&lt;1 sec</td><td><span class="saving-cell">~40 min</span></td></tr>
+        <tr><td style="color:var(--muted2);font-weight:600;">4</td><td><strong>Compliance &amp; policy check</strong></td><td><span class="badge badge-neutral">Risk &amp; Compliance</span></td><td style="color:#6B4FA0;font-weight:700;">10–30 min</td><td style="color:var(--success);font-weight:700;">&lt;1 sec</td><td><span class="saving-cell">~20 min</span></td></tr>
+        <tr><td style="color:var(--muted2);font-weight:600;">5</td><td><strong>Manager approval</strong></td><td><span class="badge badge-neutral">Operations</span></td><td style="color:#6B4FA0;font-weight:700;">30–60 min (all)</td><td style="color:var(--success);font-weight:700;">Only ~20% loads</td><td><span class="saving-cell">~40 min</span></td></tr>
+        <tr style="background:var(--bg);"><td colspan="3" style="font-weight:800;font-size:14px;">Total per quotation</td><td style="font-size:18px;font-weight:900;color:#6B4FA0;">3–8 hours</td><td style="font-size:18px;font-weight:900;color:var(--success);">&lt;3 seconds</td><td><span class="saving-cell" style="font-size:13px;">99.9%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></div>
+
+<!-- ═══ PAGE: VIBE ═══ -->
+<div class="page" id="page-vibe"><div class="container" style="max-width:860px;">
+  <div class="page-header"><h1 class="page-title">Vibe Coding</h1><p class="page-sub">Natural language as first-class input — describe what you need, the OrchestratorAgent handles the rest</p></div>
+  <div class="vibe-hero">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:42px;height:42px;border-radius:var(--r);background:var(--p20);display:grid;place-items:center;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div><div style="font-size:16px;font-weight:700;color:var(--text);">Natural Language Quotation</div><div style="font-size:13px;color:var(--muted2);margin-top:2px;">OrchestratorAgent parses intent, extracts params, routes to the right workflow</div></div>
+    </div>
+    <div class="vibe-input-wrap">
+      <div class="input-wrap"><label class="field-label" for="vibe-input">Your request in plain English</label><input class="input" id="vibe-input" placeholder='e.g. "Quote 5000 lbs from Tracy to Fremont express"' style="height:46px;font-size:14px;"></div>
+      <button class="btn-primary" id="btn-vibe" onclick="runVibe()" style="height:46px;align-self:end;white-space:nowrap;padding:0 22px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Ask
+      </button>
+    </div>
+    <div class="vibe-chips" id="vibe-examples"></div>
+  </div>
+  <div id="vibe-result"><div class="empty-state" style="min-height:120px;"><svg class="empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><div class="empty-title">Ask anything about your shipment</div><div class="empty-body">Results will appear here</div></div></div>
+</div></div>
+
+</div><!-- /app -->
+<script>
+/* ═══ STATE ═══ */
+const S={samples:[],selected:null,lastResult:null};
+const STEPS=[
+  {tool:'sanitize_vendor_text',n:1,actor:'VTS · Text Sanitizer',title:'Sanitize vendor input',copy:'Checks carrier text for prompt injection before entering agent context.'},
+  {tool:'rank_vendors_for_lane',n:2,actor:'VS · Vendor Scorer',title:'Rank carriers (70% reliability)',copy:'MCP vendor.rank_for_lane — 70% reliability / 30% cost. Selects best fit.'},
+  {tool:'compute_margin_quote',n:3,actor:'QE · Quotation Engine',title:'Build protected customer quote',copy:'vendor_cost ÷ (1−0.12) = 12% margin floor. ME Margin Evaluator validates.'},
+  {tool:'check_compliance',n:4,actor:'Policy MCP · HITL Gate',title:'Check compliance + escalate',copy:'policy.check_compliance × 3. HITL triggers on margin/SLA/weight/value fail.'},
+  {tool:'trajectory_eval',n:5,actor:'Trajectory Evaluator',title:'Assert 8-step workflow',copy:'Deterministic 8-step chain: vendor quoted → priced → margin OK → compliant → HITL evaluated.'},
+];
+const $=id=>document.getElementById(id);
+const m$=v=>v==null?'—':'$'+Number(v).toFixed(2);
+const p$=v=>v==null?'—':Number(v).toFixed(1)+'%';
+
+/* ═══ NAVIGATION ═══ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const pg=$('page-'+name); if(pg) pg.classList.add('active');
+  const tab=document.querySelector(`.nav-tab[onclick*="'${name}'"]`); if(tab) tab.classList.add('active');
+  if(name==='audit') loadTelemetry();
+}
+
+/* ═══ HEALTH ═══ */
+async function checkHealth(){
+  try{
+    const d=await fetch('/health').then(r=>r.json());
+    const el=$('health-txt'); if(el) el.textContent=`${(d.status||'ok').toUpperCase()} · ${d.agent?.agy||'agent'}`;
+    const qm=$('queue-mode'); if(qm) qm.textContent=d.agent?.instruction_loaded?'ADK Ready':'Offline';
+  }catch{const el=$('health-txt');if(el)el.textContent='API unavailable';}
+}
+
+/* ═══ SAMPLES & QUEUE ═══ */
+async function loadSamples(){
+  const d=await fetch('/api/eval-samples').then(r=>r.json());
+  S.samples=d.samples||[];
+  const sc=$('sample-count'); if(sc) sc.textContent=d.count||S.samples.length;
+  if(!S.selected&&S.samples.length){S.selected=S.samples[0];applySample(S.selected);}
+  renderQueue();
+}
+
+function filteredSamples(){
+  const lane=($('lane-filter')||{value:'all'}).value;
+  const sla=($('sla-filter')||{value:'all'}).value;
+  return S.samples.filter(s=>(lane==='all'||s.lane===lane)&&(sla==='all'||s.sla_tier===sla));
+}
+
+function renderQueue(){
+  const q=$('shipment-queue'); if(!q) return;
+  q.innerHTML=filteredSamples().slice(0,100).map(s=>{
+    const a=S.selected?.shipment_id===s.shipment_id?' active':'';
+    const sc=s.sla_tier==='express'?'badge-warning':'badge-primary';
+    return `<button class="s-row${a}" data-id="${s.shipment_id}" role="listitem">
+      <div class="s-row-top"><span class="sid">${s.shipment_id}</span><span class="badge ${sc}">${s.sla_tier}</span></div>
+      <div class="s-lane">${s.lane}</div>
+      <div class="s-row-bot"><span class="s-meta">${s.weight.toLocaleString()} lbs</span><span class="s-meta">${s.delivery_time}h</span></div>
+    </button>`;
+  }).join('');
+  q.querySelectorAll('.s-row').forEach(row=>row.addEventListener('click',()=>{
+    S.selected=S.samples.find(s=>s.shipment_id===row.dataset.id);
+    applySample(S.selected);renderQueue();runWorkflow();
+  }));
+}
+
+function applySample(s){
+  if(!s) return;
+  const set=(id,v)=>{const el=$(id);if(el)el.value=v;};
+  set('lane',s.lane);set('weight',s.weight);set('sla',s.sla_tier);
+  set('delivery-time',s.delivery_time);set('shipment-id',s.shipment_id);
+  const as=$('active-shipment'); if(as) as.textContent=`${s.shipment_id} · ${s.customer||'Sample'} · ${s.lane}`;
+}
+</script>
+<script>
+/* ═══ PIPELINE ═══ */
+function renderInitialPipeline(){
+  const el=$('pipeline'); if(!el) return;
+  el.innerHTML=STEPS.map((step,i)=>{
+    const conn=i<STEPS.length-1?'<div class="p-connector"></div>':'';
+    return `<div class="p-step"><div class="p-icon"><span class="n">${step.n}</span><span class="lbl">step</span></div>
+      <div><div class="p-actor">${step.actor}</div><div class="p-title">${step.title}</div><div class="p-copy">${step.copy}</div></div>
+      <span class="badge badge-neutral">Pending</span></div>${conn}`;
+  }).join('');
+}
+
+/* ═══ RUN WORKFLOW ═══ */
+async function runWorkflow(){
+  const btn=$('run-workflow'); if(btn) btn.disabled=true;
+  try{
+    const payload={
+      lane:($('lane')||{value:'Tracy->Fremont'}).value,
+      weight:+($('weight')||{value:1000}).value,
+      sla_tier:($('sla')||{value:'standard'}).value,
+      delivery_time:+($('delivery-time')||{value:20}).value,
+      shipment_id:($('shipment-id')||{value:'DEMO-001'}).value||S.selected?.shipment_id||'DEMO-001',
+    };
+    const r=await fetch('/api/dual-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(r=>r.json());
+    S.lastResult=r; renderResult(r); updateAuditTab(r);
+    animatePipeline();
+  }catch(e){const dt=$('decision-title');if(dt)dt.textContent='Error: '+e.message;}
+  finally{if(btn)btn.disabled=false;}
+}
+
+/* Time-spaced reveal of the 8 agentic steps so viewers see the flow start→finish. */
+async function animatePipeline(){
+  const steps=[...document.querySelectorAll('#pipeline .p-step')];
+  if(!steps.length) return;
+  steps.forEach(s=>{s.style.opacity='0';s.style.transform='translateY(8px)';s.style.transition='opacity .35s ease, transform .35s ease, box-shadow .3s ease';});
+  for(const s of steps){
+    await _sleep(420);
+    s.style.opacity='1'; s.style.transform='none';
+    s.classList.add('reveal-active');
+    setTimeout(()=>s.classList.remove('reveal-active'),650);
+  }
+}
+
+/* ═══ RENDER RESULT ═══ */
+function renderResult(r){
+  const q=r.customer_quote||{},v=r.recommended_vendor||{},hitl=r.hitl||{},traj=r.trajectory_eval||{};
+  const trace=new Set(r.tool_trace||[]);
+  const set=(id,val,style)=>{const el=$(id);if(!el)return;el.textContent=val;if(style)Object.assign(el.style,style);};
+  set('kpi-vendor',q.selected_vendor_name||v.vendor_id||'—');
+  set('kpi-rate',m$(q.total_rate));
+  set('kpi-margin',p$(q.margin_percentage));
+  set('kpi-hitl',hitl.requires_approval?'⚠ Yes':'✓ No',{color:hitl.requires_approval?'var(--danger)':'var(--success)'});
+  const amc=$('agent-mode-chip');
+  if(amc){amc.textContent=r.agent_mode||'offline';amc.className=`badge ${r.agent_mode==='adk'?'badge-primary':'badge-neutral'}`;}
+
+  const pel=$('pipeline');
+  if(pel) pel.innerHTML=STEPS.map((step,i)=>{
+    const skipped=step.tool==='sanitize_vendor_text'&&!trace.has(step.tool);
+    const done=step.tool==='trajectory_eval'?!!r.trajectory_eval:trace.has(step.tool);
+    const cls=done?'done':skipped?'skipped':'';
+    const icon=done?`<span class="n">✓</span><span class="lbl">done</span>`:skipped?`<span class="n">—</span><span class="lbl">skip</span>`:`<span class="n">${step.n}</span><span class="lbl">step</span>`;
+    const badge=done?'<span class="badge badge-success">Done</span>':skipped?'<span class="badge badge-neutral">Not needed</span>':'<span class="badge badge-neutral">Pending</span>';
+    const conn=i<STEPS.length-1?'<div class="p-connector"></div>':'';
+    return `<div class="p-step ${cls}"><div class="p-icon">${icon}</div><div><div class="p-actor">${step.actor}</div><div class="p-title">${step.title}</div><div class="p-copy">${step.copy}</div></div>${badge}</div>${conn}`;
+  }).join('');
+
+  set('h-promise',`${r.lane||q.lane||'—'} / ${q.sla_tier||'—'} / ${m$(q.total_rate)}`);
+  set('h-cover',`${q.selected_vendor_name||v.vendor_id||'—'} @ ${m$(q.vendor_cost)}`);
+  set('h-outcome',hitl.requires_approval?'⚠ Hold for manager':'✓ Ready to dispatch');
+  set('decision-title',traj.passed?'✓ All 8 trajectory checks passed — auto-dispatch eligible':'⚠ Needs review — see compliance gates');
+  set('decision-copy',buildExpl(r));
+  set('decision-price',m$(q.total_rate));
+  const rj=$('raw-json'); if(rj) rj.textContent=JSON.stringify(r,null,2);
+  renderVendors(r.ranked_vendors||[]);
+  renderCompliance(r.compliance||{},hitl);
+}
+
+function buildExpl(r){
+  const q=r.customer_quote||{},c=r.compliance||{},hitl=r.hitl||{};
+  const ok=c.passed?'passed all 3 policy gates':'did not pass all policy gates';
+  const h=hitl.requires_approval?`HITL: ${(hitl.reasons||[]).join('; ')}`:'No human approval required.';
+  return `${q.selected_vendor_name||'Vendor'} selected · ${m$(q.total_rate)} · ${p$(q.margin_percentage)} margin · Load ${ok}. ${h}`;
+}
+
+function renderVendors(vs){
+  const el=$('vendor-list'); if(!el) return;
+  if(!vs.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No vendors</div><div class="empty-body">No vendors found for this lane</div></div>';return;}
+  el.innerHTML=vs.map((v,i)=>{
+    const isSel=i===0;
+    return `<div class="vendor-card${isSel?' selected-vendor':''}">
+      <div class="vc-top">
+        <div class="vc-name-row">
+          <div class="vc-rank" style="background:${isSel?'var(--success)':'var(--primary)'};">${i+1}</div>
+          <div class="vc-name">${v.name||v.vendor_id}${isSel?'<span class="badge badge-success" style="margin-left:6px;font-size:10px;">SELECTED</span>':''}</div>
+        </div>
+        <span class="badge ${isSel?'badge-success':'badge-primary'}">Score ${v.final_score}</span>
+      </div>
+      <div class="vc-meta"><span>Cost ${m$(v.effective_rate)}</span><span>Reliability ${p$(v.reliability_score)}</span></div>
+      <div class="score-bar"><div class="score-bar-fill" style="width:${Math.min(v.final_score||0,100)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderCompliance(c,hitl){
+  const el=$('compliance-list'); if(!el) return;
+  const gates=[
+    ['① Margin ≥ 12%',c.margin_compliance],
+    ['② SLA ≤ 24h',c.sla_compliance],
+    ['③ Weight ≤ 45k lbs',c.weight_compliance],
+    ['④ HITL Gate',{compliant:!hitl.requires_approval,rule:hitl.requires_approval?(hitl.reasons||[]).join(', ')||'Escalation required':'No escalation'}],
+  ];
+  el.innerHTML=gates.map(([name,g])=>{
+    const ok=g&&g.compliant;
+    return `<div class="gate ${ok?'gate-pass':'gate-fail'}">
+      <div><div class="gate-name">${name}</div><div class="gate-rule">${g?g.rule||'—':'Not checked'}</div></div>
+      <span class="badge ${ok?'badge-success':'badge-danger'}">${ok?'Pass':'Review'}</span>
+    </div>`;
+  }).join('');
+}
+</script>
+<script>
+/* ═══ AUDIT ═══ */
+function updateAuditTab(r){
+  const traj=r.trajectory_eval||{},steps=traj.steps||[],trace=r.tool_trace||[];
+  const ts=$('trajectory-steps');
+  if(steps.length&&ts) ts.innerHTML=steps.map(s=>`
+    <div class="t-step ${s.passed?'pass':'fail'}">
+      <span style="font-weight:600;">${s.passed?'✓':'✗'} ${s.name.replace(/_/g,' ')}</span>
+      <span style="font-size:11px;color:var(--muted2);">${s.detail||''}</span>
+      <span class="badge ${s.passed?'badge-success':'badge-danger'}">${s.passed?'Pass':'Fail'}</span>
+    </div>`).join('');
+  const ttl=$('tool-trace-list');
+  if(trace.length&&ttl) ttl.innerHTML=
+    `<div style="font-size:12px;color:var(--muted2);margin-bottom:8px;">Agent called <strong>${trace.length}</strong> tool(s):</div>`+
+    trace.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:4px;font-size:12px;background:var(--surface);">
+      <span style="background:var(--primary);color:#fff;border-radius:50%;width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0;">${i+1}</span>
+      <code style="font-size:12px;color:var(--purple);font-family:ui-monospace,monospace;">${t}</code>
+    </div>`).join('');
+}
+
+async function loadTelemetry(){
+  try{
+    const d=await fetch('/api/telemetry').then(r=>r.json());
+    const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+    set('tele-ships',d.shipments_today??'—');
+    set('tele-ontime',d.on_time_rate!=null?d.on_time_rate+'%':'—');
+    set('tele-margin',d.margin_avg_pct!=null?d.margin_avg_pct+'%':'—');
+    const tr=$('tele-raw'); if(tr) tr.textContent=JSON.stringify(d,null,2);
+  }catch(e){const tr=$('tele-raw');if(tr)tr.textContent=e.message;}
+}
+
+/* ═══ EVAL BATCH ═══ */
+async function runEval(){
+  const btn=$('btn-eval'),summary=$('eval-summary'),body=$('eval-body');
+  if(btn){btn.disabled=true;btn.textContent='Running…';}
+  if(summary) summary.textContent='Running 20 shipments through the full agent pipeline…';
+  try{
+    const d=await fetch('/api/eval-run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({limit:20})}).then(r=>r.json());
+    if(summary) summary.textContent=`${d.passed}/${d.count} passed · ${d.pass_rate}% pass rate`;
+    if(body) body.innerHTML=(d.results||[]).map((item,i)=>`<tr>
+      <td style="color:var(--muted2);font-weight:600;">${i+1}</td>
+      <td style="font-weight:600;">${item.shipment_id}</td><td>${item.lane}</td>
+      <td>${item.selected_vendor||'—'}</td><td style="font-weight:600;">${m$(item.total_rate)}</td>
+      <td>${p$(item.margin_percentage)}</td>
+      <td><span class="badge ${item.compliance_passed?'badge-success':'badge-warning'}">${item.compliance_passed?'Pass':'Fail'}</span></td>
+      <td><span class="badge ${item.hitl_required?'badge-danger':'badge-success'}">${item.hitl_required?'Yes':'No'}</span></td>
+      <td><span class="badge ${item.trajectory_passed?'badge-success':'badge-warning'}">${item.trajectory_passed?'Pass':'Review'}</span></td>
+    </tr>`).join('');
+  }catch(e){if(summary)summary.textContent=e.message;}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run 20-case eval';}}
+}
+
+/* ═══ LOOPS ═══ */
+async function runLoop(n){
+  const statusEl=$(`l${n}-status`),resultEl=$(`l${n}-result`);
+  if(statusEl){statusEl.className='badge badge-warning';statusEl.textContent='Running…';}
+  if(resultEl){resultEl.classList.remove('visible');resultEl.innerHTML='';}
+  const s=S.samples[n-1]||{lane:'Tracy->Fremont',weight:1000,sla_tier:'standard',delivery_time:20,shipment_id:'LOOP-TEST'};
+  try{
+    const d=await fetch(`/api/loop/${n}`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lane:s.lane,weight:s.weight,sla_tier:s.sla_tier,delivery_time:s.delivery_time,shipment_id:s.shipment_id,margin:14.0})
+    }).then(r=>r.json());
+    if(statusEl){statusEl.className='badge badge-success';statusEl.textContent='✓ Complete';}
+    let html='<div class="loop-result-box">';
+    if(n===1){html+=`<strong>Vendor Evaluator</strong> · ${d.status} · ${d.iteration_count||1} iteration(s)<br>`;if(d.selected_vendor)html+=`Selected: <strong>${d.selected_vendor.vendor_id}</strong> (score ${d.selected_vendor.final_score})<br>`;if(d.quote)html+=`Quote: ${m$(d.quote.customer_price)} · Margin: ${p$(d.quote.margin_percentage)}`;}
+    else if(n===2){html+=`<strong>Compliance-Critic</strong> · ${d.status} · ${d.iteration_count||1} iteration(s)<br>`;html+=d.violations?.length?`Resolved: ${d.violations.map(v=>v.type).join(', ')}`:'No violations detected';}
+    else{html+=`<strong>Kaizen Meta-Loop</strong> · ${d.status} · ${d.iterations||1} cycle(s)<br>`;html+=`Auto-refined: ${d.auto_refined?'✓ Yes':'✗ No'}<br>`;(d.refinements_applied||[]).forEach(r=>{html+=`→ ${r.type}: <code>${r.config_key}</code> ${r.old_value}→${r.new_value}<br>`;});html+=`Final eval: ${d.final_eval?.passed?'✓ All pass':`${d.final_eval?.failed_count||0} failure(s)`}`;}
+    html+='</div>';
+    if(resultEl){resultEl.innerHTML=html;resultEl.classList.add('visible');}
+  }catch(e){
+    if(statusEl){statusEl.className='badge badge-danger';statusEl.textContent='Error';}
+    if(resultEl){resultEl.innerHTML=`<div class="loop-result-box error">Error: ${e.message}</div>`;resultEl.classList.add('visible');}
+  }
+}
+
+/* ═══ A2A ═══ */
+async function runA2A(){
+  const el=$('a2a-result'); if(!el) return;
+  el.innerHTML='<div class="empty-state"><div class="empty-title">Negotiating…</div><div class="empty-body">Sending QuoteRequest to vendor-side agents</div></div>';
+  try{
+    const d=await fetch('/api/a2a-negotiate',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lane:($('a2a-lane')||{value:'Tracy->Fremont'}).value,weight:+($('a2a-weight')||{value:1000}).value,sla_tier:($('a2a-sla')||{value:'standard'}).value,shipment_id:S.selected?.shipment_id||'A2A-001'})
+    }).then(r=>r.json());
+    let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div><div style="font-size:14px;font-weight:700;">${d.summary}</div><div style="font-size:12px;color:var(--muted2);">MCP ref: ${m$(d.mcp_reference_cost)} · ${d.lane}</div></div>
+      <span class="badge ${d.agreed?'badge-success':'badge-danger'}">${d.agreed?'✓ Agreement reached':'✗ No agreement'}</span></div>`;
+    (d.rounds||[]).forEach(round=>{
+      html+=`<div style="border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>Round ${round.round} — Broker target: ${m$(round.broker_target)}</strong><span class="badge badge-primary">${round.acceptances} accepted</span></div>`;
+      (round.offers||[]).forEach(o=>{html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:var(--r-sm);margin-bottom:5px;font-size:12px;background:${o.accepted?'var(--s10)':'var(--w10)'};border:1px solid ${o.accepted?'var(--s20)':'var(--w10)'};">
+        <span><strong>${o.vendor_name}</strong> — ${m$(o.offered_rate)}</span>
+        <span>${o.accepted?'<span class="badge badge-success">✓ Accepted</span>':`<span class="badge badge-warning">Counter: ${m$(o.counter_offer)}</span>`}</span>
+      </div><div style="font-size:11px;color:var(--muted2);padding:0 4px;margin-bottom:3px;">${o.reason}</div>`;});
+      html+=`</div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-title" style="color:var(--danger);">Error</div><div class="empty-body">${e.message}</div></div>`;}
+}
+
+/* ═══ AGENT COLLABORATION FLOW (agents tab) ═══ */
+async function playAgentFlow(){
+  const nodes=[...document.querySelectorAll('#agent-flow .flow-node')];
+  const cap=$('flow-caption'); if(!nodes.length) return;
+  nodes.forEach(n=>n.classList.remove('active','visited'));
+  for(let i=0;i<nodes.length;i++){
+    const n=nodes[i];
+    n.classList.add('active');
+    if(cap) cap.textContent=`Step ${i+1}/${nodes.length} — ${n.getAttribute('data-cap')||''}`;
+    await _sleep(950);
+    n.classList.remove('active'); n.classList.add('visited');
+  }
+  if(cap) cap.textContent='✓ Collaboration complete — the request became a paid, audited contract across all agents.';
+}
+
+/* ═══ AP2 PAYMENT — seamless multi-agent demo ═══ */
+const _sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function _ap2Step(name,state){const s=document.querySelector(`.ap2-step[data-step="${name}"]`);if(!s)return;s.classList.remove('active','done');if(state)s.classList.add(state);}
+async function runAP2(){
+  const el=$('ap2-result'), stepper=$('ap2-stepper'); if(!el) return;
+  if(stepper) stepper.style.display='flex';
+  ['quote','a2a','contract','pay','a2ui'].forEach(s=>_ap2Step(s,''));
+  el.innerHTML='<div class="empty-state"><div class="empty-title">Starting multi-agent flow…</div><div class="empty-body">Quoting and negotiating with carrier agents</div></div>';
+  const add=html=>{const es=el.querySelector('.empty-state'); if(es) el.innerHTML=''; el.insertAdjacentHTML('beforeend',html);};
+  try{
+    const funding=($('ap2-funding')||{value:'card'}).value;
+    const body={lane:($('ap2-lane')||{value:'Tracy->Fremont'}).value,weight:+($('ap2-weight')||{value:1000}).value,
+      sla_tier:($('ap2-sla')||{value:'standard'}).value,human_approved:($('ap2-approve')||{value:'true'}).value==='true',
+      payment_method:funding,shipment_id:'AP2-UI-'+Math.floor(Date.now()/1000)};
+    _ap2Step('quote','active');
+    const d=await fetch('/api/ap2-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    if($('ap2-mode')) $('ap2-mode').textContent='mode: '+(d.payment_mode||'—');
+    if(d.detail){el.innerHTML=`<div class="empty-state"><div class="empty-title" style="color:var(--danger);">Error</div><div class="empty-body">${d.detail}</div></div>`;return;}
+    el.innerHTML='';
+    const q=d.quote||{}, neg=d.negotiation||{}, im=d.intent_mandate||{}, cm=d.cart_mandate||{}, rc=d.receipt||{};
+
+    // ① Quotation
+    add(`<div class="ap2-stage"><div class="ap2-stage-title" style="color:var(--primary);">① Quotation — QuotationDecisionAgent</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;">
+        <div>Lane <strong>${q.lane||body.lane}</strong></div><div>Carrier <strong>${q.selected_vendor_name||q.selected_vendor_id||'—'}</strong></div>
+        <div>Customer price <strong>${m$(q.customer_price)}</strong></div><div>Margin <strong>${(q.margin_percentage||0).toFixed(1)}%</strong></div></div></div>`);
+    _ap2Step('quote','done'); await _sleep(450);
+
+    // ② A2A Negotiation (live rounds)
+    _ap2Step('a2a','active');
+    let rh='';(neg.rounds||[]).forEach(r=>{rh+=`<div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;margin-bottom:6px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><strong>Round ${r.round} — target ${m$(r.broker_target)}</strong><span class="badge badge-primary">${r.acceptances} accepted</span></div>`;
+      (r.offers||[]).forEach(o=>{rh+=`<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 8px;border-radius:var(--r-sm);margin-bottom:2px;background:${o.accepted?'var(--s10)':'var(--w10)'};"><span>${o.vendor_name} — ${m$(o.offered_rate)}</span><span>${o.accepted?'<span class="badge badge-success">✓ accepted</span>':('counter '+m$(o.counter_offer))}</span></div>`;});rh+=`</div>`;});
+    add(`<div class="ap2-stage"><div class="ap2-stage-title" style="color:var(--purple);">② A2A Negotiation — Broker ↔ Carrier Agents</div>${rh}<div style="font-size:12px;margin-top:2px;">${neg.summary||''}</div></div>`);
+    _ap2Step('a2a','done'); await _sleep(450);
+
+    // ③ Contract lock
+    _ap2Step('contract','active');
+    add(`<div class="ap2-stage"><div class="ap2-stage-title" style="color:var(--primary);">③ Contract Lock — AP2 Mandate Chain</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;"><div style="font-size:11px;font-weight:700;color:var(--purple);">Intent Mandate</div><div style="font-size:12px;margin-top:4px;">Spend cap <strong>${m$(im.max_amount)}</strong></div><div style="font-size:10px;color:var(--muted2);word-break:break-all;">hash ${(im.content_hash||'').slice(0,20)}…</div></div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;"><div style="font-size:11px;font-weight:700;color:var(--primary);">Cart Mandate</div><div style="font-size:12px;margin-top:4px;">${cm.vendor_name||cm.vendor_id} · <strong>${m$(cm.agreed_rate)}</strong> ≤ cap ✓</div><div style="font-size:10px;color:var(--muted2);">${cm.status}${cm.approved_by?(' · ✔ '+cm.approved_by):''}</div></div></div></div>`);
+    _ap2Step('contract','done'); await _sleep(450);
+
+    // Pending approval — stop before payment
+    if(d.status==='pending_approval'){const s=(d.supervisor_summary||{}).summary||{};_ap2Step('pay','active');
+      add(`<div class="ap2-stage" style="border-color:var(--w20);background:var(--w10);"><div class="ap2-stage-title" style="color:var(--warning);">⏸ Awaiting Approval — HumanSupervisorAgent</div>
+        <div style="font-size:13px;"><strong>${s.action||''}</strong></div><div style="font-size:12px;color:var(--muted2);margin-top:4px;">${s.rationale||''}</div>
+        <div style="font-size:12px;margin-top:6px;">${s.recommendation||''} · reversibility <strong>${s.reversibility||''}</strong></div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:6px;">Switch “Human approval → Approved” and re-run to release payment.</div></div>`);
+      _ap2Step('pay',''); return;}
+
+    // ④ AP2 Payment (Stripe/Plaid transaction)
+    _ap2Step('pay','active');
+    const fs=rc.funding_source||{};
+    const fline=rc.funding_type==='ach'
+      ? `🏦 Plaid bank ${fs.institution||'sandbox'} ••••${fs.account_mask||''}${fs.stripe_bank_account_token?(' · token '+String(fs.stripe_bank_account_token).slice(0,14)+'…'):''}`
+      : `💳 Card •••• ${fs.last4||'4242'} (Stripe test)`;
+    add(`<div class="ap2-stage" style="border-color:var(--s20);background:var(--s10);"><div class="ap2-stage-title" style="color:var(--success);">④ AP2 Payment — Vendor Receives · ${(d.payment_mode||'').replace('_',' ')}</div>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;"><span style="font-size:15px;font-weight:800;">${m$(rc.amount)} ${rc.currency||'USD'} → ${cm.vendor_name||cm.vendor_id}</span><span class="badge ${rc.status==='succeeded'?'badge-success':'badge-primary'}">${rc.status}</span></div>
+      <div style="font-size:12px;margin-top:6px;">Funding: <strong>${fline}</strong></div>
+      <div style="font-size:12px;color:var(--muted2);">${rc.processor} · ${rc.stripe_object_type||'mock'} · ref <code>${rc.processor_ref}</code></div>
+      ${rc.ach_fallback_reason?`<div style="font-size:11px;color:var(--warning);margin-top:4px;">ACH note: ${rc.ach_fallback_reason}</div>`:''}
+      ${d.payment_mode==='live_sandbox'?`<div style="font-size:11px;color:var(--muted2);margin-top:5px;">🔎 Visible in the Stripe test dashboard → Payments</div>`:''}
+      <div style="font-size:12px;color:var(--success);margin-top:8px;">✓ ${(d.vendor_acknowledgement||{}).message||''}</div></div>`);
+    _ap2Step('pay','done'); await _sleep(450);
+
+    // ⑤ A2UI narrative
+    _ap2Step('a2ui','active');
+    try{
+      const nb={audience:'executive',context:`AP2 settlement for ${body.shipment_id} on ${body.lane}.`,
+        agent_outputs:{commerce:{vendor_name:cm.vendor_name,vendor_id:cm.vendor_id,agreed_rate:rc.amount,margin_percentage:cm.margin_percentage,funding_type:rc.funding_type,processor:rc.processor,payment_status:rc.status}}};
+      const n=await fetch('/api/generate-narrative',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nb)}).then(r=>r.json());
+      const tk=(n.key_takeaways||[]).map(t=>`<li style="font-size:12px;margin-bottom:2px;">${t}</li>`).join('');
+      add(`<div class="ap2-stage"><div class="ap2-stage-title" style="color:var(--warning);">⑤ A2UI Summary — A2UIConciergeAgent</div>
+        <div style="font-size:13px;font-weight:700;">${n.title||'Executive Briefing'}</div>
+        <div style="font-size:12px;color:var(--muted2);margin-top:4px;">${n.narrative||''}</div>${tk?`<ul style="margin:8px 0 0 16px;padding:0;">${tk}</ul>`:''}</div>`);
+    }catch(e){add(`<div class="ap2-stage"><div class="ap2-stage-title">⑤ A2UI Summary</div><div style="font-size:12px;color:var(--muted2);">Narrative unavailable: ${e.message}</div></div>`);}
+    _ap2Step('a2ui','done');
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-title" style="color:var(--danger);">Error</div><div class="empty-body">${e.message}</div></div>`;}
+}
+
+/* ═══ VIBE ═══ */
+async function loadVibeExamples(){
+  try{
+    const d=await fetch('/api/vibe/examples').then(r=>r.json());
+    const el=$('vibe-examples'); if(!el) return;
+    el.innerHTML=(d.examples||[]).map(ex=>`<button class="vibe-chip" onclick="$('vibe-input').value='${ex.replace(/'/g,"\\'")}';">${ex}</button>`).join('');
+  }catch{}
+}
+
+async function runVibe(){
+  const inp=$('vibe-input'),res=$('vibe-result'),btn=$('btn-vibe');
+  if(!inp||!res) return;
+  const msg=inp.value.trim(); if(!msg) return;
+  if(btn){btn.disabled=true;btn.textContent='Thinking…';}
+  res.innerHTML='<div class="empty-state"><div class="empty-title">Processing…</div><div class="empty-body">OrchestratorAgent is routing your request</div></div>';
+  try{
+    const d=await fetch('/api/vibe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})}).then(r=>r.json());
+    const result=d.result||d.record||d.stats||{};
+    const q=result.customer_quote||{};
+    let html=`<div class="vibe-result-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div><div style="font-size:15px;font-weight:700;">"${msg}"</div>
+          <div style="font-size:12px;color:var(--muted2);margin-top:4px;">Understood as <strong>${d.understood_as||d.routed_to}</strong> · ${d.agent_mode||'offline'}</div>
+          ${d.reasoning?`<div style="font-size:11px;color:var(--muted2);margin-top:2px;">${d.reasoning}</div>`:''}
+        </div>
+        <span class="badge ${d.routed_to==='recall_history'?'badge-purple':d.routed_to==='memory_stats'?'badge-warning':'badge-success'}">${d.routed_to}</span>
+      </div>`;
+    if(d.extracted_params) html+=`<div style="font-size:11px;color:var(--muted2);background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;margin-bottom:10px;"><strong>Extracted:</strong> <code style="font-family:ui-monospace,monospace;">${JSON.stringify(d.extracted_params)}</code></div>`;
+    if(q.total_rate||result.workflow){
+      html+=`<div style="background:var(--s10);border:1px solid var(--s20);border-radius:var(--r-sm);padding:12px;font-size:13px;line-height:1.8;">`;
+      if(q.selected_vendor_name) html+=`Vendor: <strong>${q.selected_vendor_name}</strong><br>`;
+      if(q.total_rate) html+=`Rate: <strong>${m$(q.total_rate)}</strong> · Margin: <strong>${p$(q.margin_percentage)}</strong><br>`;
+      if(result.hitl) html+=`HITL: ${result.hitl.requires_approval?'⚠ Required':'✓ Not required'}`;
+      html+=`</div>`;
+    }else{html+=`<pre style="background:var(--bg);border-radius:var(--r-sm);padding:10px;font-size:11px;max-height:180px;overflow:auto;font-family:ui-monospace,monospace;">${JSON.stringify(result,null,2)}</pre>`;}
+    html+=`</div>`;
+    res.innerHTML=html;
+  }catch(e){res.innerHTML=`<div class="empty-state"><div class="empty-title" style="color:var(--danger);">Error</div><div class="empty-body">${e.message}</div></div>`;}
+  finally{if(btn){btn.disabled=false;btn.textContent='Ask';}}
+}
+
+/* ═══ DEPLOY MODAL ═══ */
+function showDeployModal(){
+  const ex=document.getElementById('deploy-modal');if(ex){ex.remove();return;}
+  const m=document.createElement('div');m.id='deploy-modal';
+  m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Deploy to GCP');
+  m.style.cssText='position:fixed;inset:0;background:rgba(15,22,41,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+  m.innerHTML=`<div style="background:var(--surface);border-radius:var(--r-2xl);padding:30px;max-width:520px;width:100%;box-shadow:var(--sh-xl);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div><div style="font-size:18px;font-weight:800;color:var(--text);">Deploy to Google Cloud Run</div><div style="font-size:12px;color:var(--muted2);margin-top:3px;">One-click 8-step production deployment</div></div>
+      <button onclick="document.getElementById('deploy-modal').remove()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--border);font-size:18px;cursor:pointer;display:grid;place-items:center;color:var(--muted2);" aria-label="Close">✕</button>
+    </div>
+    <pre style="background:#0E1525;color:#A5B4FC;border-radius:var(--r);padding:16px;font-size:12px;overflow:auto;margin-bottom:16px;line-height:1.7;font-family:ui-monospace,monospace;">gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+export GEMINI_API_KEY="your-key-here"
+./deployment/cloudrun/deploy.sh YOUR_PROJECT_ID us-central1</pre>
+    <div style="background:var(--s10);border:1px solid var(--s20);border-radius:var(--r);padding:14px;font-size:12px;line-height:1.85;margin-bottom:12px;">
+      <strong>8-step script automates:</strong><br>
+      ① Enable GCP APIs · ② Artifact Registry · ③ Service account + IAM<br>
+      ④ Secret Manager (GEMINI key) · ⑤ Cloud Build image<br>
+      ⑥ Render service.yaml · ⑦ Deploy Cloud Run · ⑧ Print URL
+    </div>
+    <div style="font-size:11px;color:var(--muted2);">Prerequisites: <code style="font-family:ui-monospace,monospace;">gcloud</code> CLI installed · GCP billing enabled</div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)m.remove();});
+  // Focus the close button for accessibility
+  setTimeout(()=>{const cb=m.querySelector('button[aria-label="Close"]');if(cb)cb.focus();},50);
+}
+
+/* ═══ EVENTS & BOOT ═══ */
+document.addEventListener('DOMContentLoaded',()=>{
+  const rw=$('run-workflow'); if(rw) rw.addEventListener('click',runWorkflow);
+  const be=$('btn-eval');     if(be) be.addEventListener('click',()=>{showPage('audit');runEval();});
+  const lf=$('lane-filter');  if(lf) lf.addEventListener('change',renderQueue);
+  const sf=$('sla-filter');   if(sf) sf.addEventListener('change',renderQueue);
+  const vi=$('vibe-input');   if(vi) vi.addEventListener('keydown',e=>{if(e.key==='Enter')runVibe();});
+  checkHealth();
+  renderInitialPipeline();
+  loadVibeExamples();
+  loadSamples().then(()=>runWorkflow());
+});
+</script>
+</body>
+</html>

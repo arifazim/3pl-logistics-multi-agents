@@ -1,0 +1,4 @@
+- All shipments must have valid route
+- Cost must include vendor + margin
+- SLA violations must be flagged
+- Human escalation must trigger on low confidence
