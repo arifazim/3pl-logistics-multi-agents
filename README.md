@@ -1,4 +1,4 @@
-# 3PL Multi-Agent Optimization System
+# FreightIQ - An Autonomous 3PL Multi-Agent Optimization System
 
 **A production-grade multi-agent logistics system** where eight specialized agents
 collaborate — from natural-language request to a quoted, negotiated, human-approved,
@@ -13,33 +13,36 @@ stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 
 ---
 
-## System Visualization
+## System Architecture
 
-![Agentic Architecture](Images/AgenticArchitecture.jpg)
+<img src="Images/AgenticArchitecture.jpg" alt="Agentic Architecture" width="100%"/>
 *Eight specialized agents collaborating through A2A, AP2, and A2UI protocols*
 
-![Before vs After](Images/BeforeVsAfter.jpg)
+## ROI
+
+<img src="Images/TimeSaved.jpg" alt="Time Saved" width="100%"/>
+<img src="Images/BeforeVsAfter.jpg" alt="Before vs After" width="100%"/>
+*Time savings achieved through automated agent workflows*
 *Comparison showing efficiency gains from multi-agent optimization*
 
-![Time Saved](Images/TimeSaved.jpg)
-*Time savings achieved through automated agent workflows*
+## System Visualization
 
-![Dashboard](Images/Dashboard.jpg)
+<img src="Images/Dashboard.jpg" alt="Dashboard" width="100%"/>
 *Main dashboard UI showing agent collaboration and payment flows*
 
-![AP2 Payment Flow](Images/AP2-Payment.jpg)
+<img src="Images/AP2-Payment.jpg" alt="AP2 Payment Flow" width="100%"/>
 *AP2 payment flow showing intent/cart mandates and Stripe/Plaid integration*
 
-![Agentic Guardrails](Images/AgenticGuardrails.jpg)
+<img src="Images/AgenticGuardrails.jpg" alt="Agentic Guardrails" width="100%"/>
 *Security guardrails including margin floor, HITL gates, and payment safety*
 
-![Agentic Audit Trail](Images/AgenticAuditTrail.jpg)
+<img src="Images/AgenticAuditTrail.jpg" alt="Agentic Audit Trail" width="100%"/>
 *Audit trail demonstrating agent decision logging and compliance tracking*
 
-![Loop Engineering](Images/LoopEngineering.jpg)
+<img src="Images/LoopEngineering.jpg" alt="Loop Engineering" width="100%"/>
 *Three bounded autonomous loops for vendor evaluation, compliance, and kaizen*
 
-![Vibe Coding](Images/VibeCoding.jpg)
+<img src="Images/VibeCoding.jpg" alt="Vibe Coding" width="100%"/>
 *Natural language Quotation generation*
 
 ---
@@ -167,20 +170,15 @@ This project was built using **OpenCode** (antigravity IDE) with **antigravity m
 
 Google ADK · Agent CLI · Google Agent ADK Tools Vertex AI (Gemini 2.0 Flash) ·  MCP (stdio) · Cloud Run · Antigravity IDE · FastAPI · OR-Tools · Stripe (test) · Plaid (sandbox) · Pydantic · pytest · uv.
 
- ┌────────────────────────────────────────────────────────┐
- │                   AGENTS CLI                           │  <-- Automates the lifecycle 
- │  (Scaffolding, Testing, Evaluations, Cloud Deploy)     │      using AI prompts
- └───────────────────────────┬────────────────────────────┘
-                             │ orchestrates
- ┌───────────────────────────▼────────────────────────────┐
- │                     GOOGLE ADK                         │  <-- Core coding framework
- │(Core Agent Logic, Multi-Agent Graphs, State Management)│      written in Python/TS
- └───────────────────────────┬────────────────────────────┘
-                             │ equips
- ┌───────────────────────────▼────────────────────────────┐
- │               GOOGLE AGENT ADK TOOLS                   │  <-- Capabilities & actions 
- │ (Google Search, BigQuery, Custom Python Functions)     │      the agent executes
- └────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    A[AGENTS CLI<br/>Scaffolding, Testing, Evaluations, Cloud Deploy<br/>Automates lifecycle using AI prompts] -->|orchestrates| B[GOOGLE ADK<br/>Core Agent Logic, Multi-Agent Graphs, State Management<br/>Core coding framework in Python/TS]
+    B -->|equips| C[GOOGLE AGENT ADK TOOLS<br/>Google Search, BigQuery, Custom Python Functions<br/>Capabilities & actions the agent executes]
+    
+    style A fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style B fill:#fff4e1,stroke:#ff6f00,stroke-width:2px
+    style C fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+```
 
  ## Docs
 
