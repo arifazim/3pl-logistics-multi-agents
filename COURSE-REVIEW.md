@@ -1,4 +1,4 @@
-# Capstone Review — 3PL Multi-Agent Optimization System
+# Capstone Project Review [ 3PL Multi-Agent Optimization System ]
 
 ## Development Toolchain
 
@@ -7,7 +7,7 @@ Built end-to-end using **OpenCode** (antigravity IDE) with **antigravity models*
 
 | Tool                             | Role                                                                                   |
 | -------------------------------- | -------------------------------------------------------------------------------------- |
-| **OpenCode** (antigravity IDE)   | Agentic coding, refactoring, test generation, doc writing throughout the build         |
+| **Antigravity IDE**   | Agentic coding, refactoring, test generation, doc writing throughout the build         |
 | **Antigravity models**           | LLM backbone for all OpenCode development sessions                                     |
 | **Google ADK**                   | Agent framework (`LlmAgent`, `InMemoryRunner`, tool registration) for all 8 agents     |
 | **Google Agent CLI**             | Fleet scaffolding, evaluation runs, Cloud Run deployment                               |

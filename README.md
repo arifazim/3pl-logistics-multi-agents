@@ -5,7 +5,7 @@ collaborate — from natural-language request to a quoted, negotiated, human-app
 and **paid** freight contract — over **A2A**, **AP2**, and **A2UI**, on the Google Agent
 stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 
-> Built with **OpenCode** (antigravity IDE) using **antigravity models**, **Google ADK**,
+> Built with **Antigravity IDE using **antigravity models**, **Google ADK**,
 > **Google Agent CLI**, and deployed to **Google Cloud Run**.
 
 > Watch it live: **Agents** tab → _▶ Play collaboration_, then **AP2 Pay** tab →
@@ -13,9 +13,34 @@ stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 
 ---
 
-## Multiagents diagram
+## System Visualization
 
-[Watch Multiagents in action](images/agenticworkflow.gif)
+![Agentic Architecture](Images/AgenticArchitecture.jpg)
+*Eight specialized agents collaborating through A2A, AP2, and A2UI protocols*
+
+![Before vs After](Images/BeforeVsAfter.jpg)
+*Comparison showing efficiency gains from multi-agent optimization*
+
+![Time Saved](Images/TimeSaved.jpg)
+*Time savings achieved through automated agent workflows*
+
+![Dashboard](Images/Dashboard.jpg)
+*Main dashboard UI showing agent collaboration and payment flows*
+
+![AP2 Payment Flow](Images/AP2-Payment.jpg)
+*AP2 payment flow showing intent/cart mandates and Stripe/Plaid integration*
+
+![Agentic Guardrails](Images/AgenticGuardrails.jpg)
+*Security guardrails including margin floor, HITL gates, and payment safety*
+
+![Agentic Audit Trail](Images/AgenticAuditTrail.jpg)
+*Audit trail demonstrating agent decision logging and compliance tracking*
+
+![Loop Engineering](Images/LoopEngineering.jpg)
+*Three bounded autonomous loops for vendor evaluation, compliance, and kaizen*
+
+![Vibe Coding](Images/VibeCoding.jpg)
+*Natural language Quotation generation*
 
 ---
 
@@ -52,7 +77,7 @@ Every agent loads its `.agy` specification + skill contracts at startup — the 
 
 ---
 
-## Margin protection (real, not a tautology)
+## Margin protection 
 
 `customer_price = ceil(vendor_cost / (1 − 0.12))` computed from the **selected** vendor's
 cost — rounded up to the cent so the 12% floor is never breached. Proven by
@@ -112,7 +137,7 @@ curl -X POST http://localhost:9000/api/ap2-payment \
 ## Guardrails
 
 - **12% margin floor** enforced in Python, never the LLM.
-- **HITL** gate blocks auto-dispatch on low margin, high value ≥ $10k, compliance failure, or prompt-injection flag.
+- **Human In The Loop (HITL)** gate blocks auto-dispatch on low margin, high value ≥ $10k, compliance failure, or prompt-injection flag.
 - **AP2**: no charge without an approved Cart Mandate, and never above the Intent spend cap.
 - **Payments**: live keys / production Plaid hard-blocked; default is a network-free mock.
 - **Skills loader is strict** — a missing skill fails loud, not silently.
@@ -126,7 +151,7 @@ This project was built using **OpenCode** (antigravity IDE) with **antigravity m
 
 | Tool                                | Role in this project                                                            |
 | ----------------------------------- | ------------------------------------------------------------------------------- |
-| **OpenCode** (antigravity IDE)      | Primary development environment; agentic coding, refactoring, test generation   |
+| **Antigravity IDE**      | Primary development environment; agentic coding, refactoring, test generation   |
 | **Antigravity models**              | LLM backbone for OpenCode-driven development sessions                           |
 | **Google ADK** (`google-adk`)       | Agent framework: `LlmAgent`, `InMemoryRunner`, tool registration                |
 | **Google Agent CLI** (`agents-cli`) | Scaffold, evaluate, and deploy the agent fleet                                  |
@@ -138,7 +163,26 @@ This project was built using **OpenCode** (antigravity IDE) with **antigravity m
 
 ---
 
-## Docs
+## Tech stack
+
+Google ADK · Agent CLI · Google Agent ADK Tools Vertex AI (Gemini 2.0 Flash) ·  MCP (stdio) · Cloud Run · Antigravity IDE · FastAPI · OR-Tools · Stripe (test) · Plaid (sandbox) · Pydantic · pytest · uv.
+
+ ┌────────────────────────────────────────────────────────┐
+ │                   AGENTS CLI                           │  <-- Automates the lifecycle 
+ │  (Scaffolding, Testing, Evaluations, Cloud Deploy)     │      using AI prompts
+ └───────────────────────────┬────────────────────────────┘
+                             │ orchestrates
+ ┌───────────────────────────▼────────────────────────────┐
+ │                     GOOGLE ADK                         │  <-- Core coding framework
+ │(Core Agent Logic, Multi-Agent Graphs, State Management)│      written in Python/TS
+ └───────────────────────────┬────────────────────────────┘
+                             │ equips
+ ┌───────────────────────────▼────────────────────────────┐
+ │               GOOGLE AGENT ADK TOOLS                   │  <-- Capabilities & actions 
+ │ (Google Search, BigQuery, Custom Python Functions)     │      the agent executes
+ └────────────────────────────────────────────────────────┘
+
+ ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — full system design, agents, harness, workflows, stack.
 - [BUILD.md](BUILD.md) — Cloud Run build + deploy notes.
@@ -146,9 +190,3 @@ This project was built using **OpenCode** (antigravity IDE) with **antigravity m
 - [COURSE-REVIEW.md](COURSE-REVIEW.md) — capability-by-capability review against the capstone spec.
 
 ---
-
-## Tech stack
-
-Google ADK · Vertex AI (Gemini 2.0 Flash) · Agent CLI · MCP (stdio) · Cloud Run ·
-OpenCode (antigravity IDE) · FastAPI · OR-Tools · Stripe (test) · Plaid (sandbox) ·
-Pydantic · pytest · uv.
