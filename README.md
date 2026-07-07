@@ -14,36 +14,34 @@ stack (Google ADK · Vertex AI / Gemini · Agent CLI · MCP · Cloud Run).
 ---
 
 ## System Architecture
-
+**Eight specialized agents collaborating through A2A, AP2, and A2UI protocols**
 <img src="Images/AgenticArchitecture.jpg" alt="Agentic Architecture" width="100%"/>
-*Eight specialized agents collaborating through A2A, AP2, and A2UI protocols*
+
 
 ## ROI
-
+**Time savings achieved through automated agent workflows**
+**Comparison showing efficiency gains from multi-agent optimization**
 <img src="Images/TimeSaved.jpg" alt="Time Saved" width="100%"/>
 <img src="Images/BeforeVsAfter.jpg" alt="Before vs After" width="100%"/>
-*Time savings achieved through automated agent workflows*
-*Comparison showing efficiency gains from multi-agent optimization*
 
 ## System Visualization
-
+**Main dashboard UI showing agent collaboration and payment flows**
 <img src="Images/Dashboard.jpg" alt="Dashboard" width="100%"/>
-*Main dashboard UI showing agent collaboration and payment flows*
 
+**AP2 payment flow showing intent/cart mandates and Stripe/Plaid integration**
 <img src="Images/AP2-Payment.jpg" alt="AP2 Payment Flow" width="100%"/>
-*AP2 payment flow showing intent/cart mandates and Stripe/Plaid integration*
 
+**Security guardrails including margin floor, HITL gates, and payment safety**
 <img src="Images/AgenticGuardrails.jpg" alt="Agentic Guardrails" width="100%"/>
-*Security guardrails including margin floor, HITL gates, and payment safety*
 
+**Audit trail demonstrating agent decision logging and compliance tracking**
 <img src="Images/AgenticAuditTrail.jpg" alt="Agentic Audit Trail" width="100%"/>
-*Audit trail demonstrating agent decision logging and compliance tracking*
 
+**Three bounded autonomous loops for vendor evaluation, compliance, and kaizen**
 <img src="Images/LoopEngineering.jpg" alt="Loop Engineering" width="100%"/>
-*Three bounded autonomous loops for vendor evaluation, compliance, and kaizen*
 
+**Natural language Quotation generation**
 <img src="Images/VibeCoding.jpg" alt="Vibe Coding" width="100%"/>
-*Natural language Quotation generation*
 
 ---
 
